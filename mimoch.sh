@@ -18,7 +18,7 @@ for MF in `find ${MD} -type f `; do # module file
 		test -n "$MA" ; # matching assignment
 		then
 		for PD in ${MV//:/ }; do # path directory
-			test -d ${PD} || echo "module ${MN} [${MF}] : ${MI}=\"$PD\" not a directory!" ; 
+			test -d ${PD} || echo "module ${MN} [${MF}] ${MC} ${MI} \"${PD}\" not a directory!" ; 
 		done; 
 	fi  ; 
 	done;
