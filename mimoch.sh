@@ -7,7 +7,10 @@ for MF in `find ${MD} -type f `; do # module file
 	bn=`basename ${MF}`; test ${bn:0:1} = . && continue # no hidden files
 	MN=`echo ${MF} | sed 's/\s\s*/ /g' | rev | awk  -F / '{print $1"/"$2 }'| rev` # module name
 	module avail ${MN} > /dev/null || { echo "internal error!"; exit 1; } # we assert module to be valid
-	for PVID in '\(pre\|ap\)pend-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
+	for PVID in \
+		'\(pre\|ap\)pend-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>' \
+		'prereq .*' \
+		; do # path variable identifier expressions
 	#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
 	if test -f ${MF} && grep -l '#%Module' >/dev/null ${MF}  && \
 		MPL="`module show ${MF} | sed 's/\s\s*/ /g' | grep "^${PVID} .*$" | grep -v '^\(--\|module-whatis\|  *\)'  `" && \
@@ -17,6 +20,12 @@ for MF in `find ${MD} -type f `; do # module file
 		MA=`echo "${MC} ${MI}" | grep "${PVID}" `      && \
 		test -n "$MA" ; # matching assignment
 		then
+		test ${MC} == 'prereq' && { \
+			for RM in ${MI} ${MV}  ; do
+				test -z "`module avail ${RM}`" && \
+					echo "module ${MN} [${MF}] ${MC} \"${RM}\" not a module!" ; 
+			done
+			continue; }
 		for PD in ${MV//:/ }; do # path directory
 			test -d ${PD} || echo "module ${MN} [${MF}] ${MC} ${MI} \"${PD}\" not a directory!" ; 
 		done; 
