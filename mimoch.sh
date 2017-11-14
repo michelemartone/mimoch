@@ -9,6 +9,7 @@ which sed || exit
 for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
 cd ${MD}
 for MF in `find * -type f `; do # module file
+	FN=${MD}/${MF}
 	bn=`basename ${MF}`; test ${bn:0:1} = . && continue # no hidden files
 	grep -l '#%Module' 2>&1 >/dev/null ${MF}  || continue # skip non-module files
 	#MN=`echo ${MF} | sed 's/\s\s*/ /g' | rev | awk  -F / '{print $1"/"$2 }'| rev` # module name
@@ -38,11 +39,11 @@ for MF in `find * -type f `; do # module file
 		test "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
 				test -z "`module avail ${RM} 2>&1`" && \
-					echo "module ${MN} [${MF}] ${MC} \"${RM}\" not a module!${EI}";
+					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}";
 			done
 			continue; }
 		for PD in ${MV//:/ }; do # path directory
-			test -d ${PD} || echo "module ${MN} [${MF}] ${MC} ${MI} \"${PD}\" not a directory!${EI}";
+			test -d ${PD} || echo "module ${MN} [${FN}] ${MC} ${MI} \"${PD}\" not a directory!${EI}";
 		done; 
 	done;
 done    ; 
