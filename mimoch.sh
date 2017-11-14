@@ -16,6 +16,12 @@ for MF in `find * -type f `; do # module file
 	MO="`module avail ${MN} 2>&1`"
 	#test -z "${MO}" && { echo "internal error with module avail ${MN}: ${MF}!"; exit 1; } # we assert module to be valid
 	test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; } # e.g. tempdir/1.0~
+	CI=`grep @ ${MF}` 
+	ERE='[a-zA-Z.]\+@lrz.de'
+	NRE='[^@]\+\s\+'
+	CL=`echo ${CI} | sed "s/\(${NRE}\)\\+\(${ERE}\)/\2 /g"`
+	EI=''
+	test -n "${CL}" && EI=" [${CL/% /}]" # extra info
 	for PVID in \
 		'\(pre\|ap\)pend-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>' \
 		'prereq .*' \
@@ -28,14 +34,15 @@ for MF in `find * -type f `; do # module file
 		MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
 		MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
 		test -n "$MA" || continue # matching assignment
+		#echo $MD/${MF}
 		test "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
 				test -z "`module avail ${RM} 2>&1`" && \
-					echo "module ${MN} [${MF}] ${MC} \"${RM}\" not a module!" ; 
+					echo "module ${MN} [${MF}] ${MC} \"${RM}\" not a module!${EI}";
 			done
 			continue; }
 		for PD in ${MV//:/ }; do # path directory
-			test -d ${PD} || echo "module ${MN} [${MF}] ${MC} ${MI} \"${PD}\" not a directory!" ; 
+			test -d ${PD} || echo "module ${MN} [${MF}] ${MC} ${MI} \"${PD}\" not a directory!${EI}";
 		done; 
 	done;
 done    ; 
