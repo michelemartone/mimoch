@@ -1,14 +1,20 @@
 #!/bin/bash
+#Modules checking script -- for internal use -- please do not distribute.
+#Author: Michele Martone
 #module purge || exit
+#set -x
 module unload lrz/$USER 
 module load admin lrz/default 
 MY_MODULEPATH=${1:-$MODULEPATH}
+PATTERN=${2:-$PATTERN}
+VERBOSE=1 # 
 which grep || exit
 which sed || exit
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
 for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
+test ${VERBOSE} == 1 && echo looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
 cd ${MD}
-for MF in `find * -type f `; do # module file
+for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	FN=${MD}/${MF}
 	bn=`basename ${MF}`; test ${bn:0:1} = . && continue # no hidden files
 	grep -l '#%Module' 2>&1 >/dev/null ${MF}  || continue # skip non-module files
@@ -23,6 +29,7 @@ for MF in `find * -type f `; do # module file
 	CL=`echo ${CI} | sed "s/\(${NRE}\)\\+\(${ERE}\)/\2 /g"`
 	EI=''
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra info
+	test ${VERBOSE} == 1 && echo "Checking ${FN}"
 	for PVID in \
 		'\(pre\|ap\)pend-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>' \
 		'prereq .*' \
