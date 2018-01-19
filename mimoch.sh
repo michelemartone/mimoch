@@ -7,7 +7,7 @@ module unload lrz/$USER
 module load admin lrz/default 
 MY_MODULEPATH=${1:-$MODULEPATH}
 PATTERN=${2:-$PATTERN}
-VERBOSE=1 # 
+${VERBOSE:=0}
 which grep || exit
 which sed || exit
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
