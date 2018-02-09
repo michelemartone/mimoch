@@ -5,7 +5,9 @@
 #set -x
 module unload lrz/$USER 
 module load admin lrz/default 
+USER_MP="$1"
 MY_MODULEPATH=${1:-$MODULEPATH}
+test -f ${MY_MODULEPATH} && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
 PATTERN=${2:-$PATTERN}
 ${VERBOSE:=0}
 which grep || exit
@@ -22,7 +24,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	MN=${MF}
 	MO="`module avail ${MN} 2>&1`"
 	#test -z "${MO}" && { echo "internal error with module avail ${MN}: ${MF}!"; exit 1; } # we assert module to be valid
-	test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; } # e.g. tempdir/1.0~
+	if test ! -f "${USER_MP}" ; then test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; }; fi # e.g. tempdir/1.0~
 	CI=`grep @ ${MF}` 
 	ERE='[a-zA-Z.]\+@lrz.de'
 	NRE='[^@]\+\s\+'
@@ -35,7 +37,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		'prereq .*' \
 		; do # path variable identifier expressions
 	#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
-		MPL="`module show ${MF} 2>&1 | sed 's/\s\s*/ /g' | grep "^${PVID} .*$" | grep -v '^\(--\|module-whatis\|  *\)'  `" && \
+		MPL="`module show ${PWD}/${MF} 2>&1 | sed 's/\s\s*/ /g' | grep "^${PVID} .*$" | grep -v '^\(--\|module-whatis\|  *\)'  `" && \
 		test -n "${MPL}" && \
 		MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
 		MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
