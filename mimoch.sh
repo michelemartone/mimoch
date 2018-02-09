@@ -3,6 +3,7 @@
 #Author: Michele Martone
 #module purge || exit
 #set -x
+#set -e
 module unload lrz/$USER 
 module load admin lrz/default 
 USER_MP="$1"
@@ -12,6 +13,7 @@ PATTERN=${2:-$PATTERN}
 ${VERBOSE:=0}
 which grep || exit
 which sed || exit
+ERRORS=0
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
 for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
 test ${VERBOSE} == 1 && echo looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
@@ -36,7 +38,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		'\(pre\|ap\)pend-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>' \
 		'prereq .*' \
 		; do # path variable identifier expressions
-	#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
+		#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
 		MPL="`module show ${PWD}/${MF} 2>&1 | sed 's/\s\s*/ /g' | grep "^${PVID} .*$" | grep -v '^\(--\|module-whatis\|  *\)'  `" && \
 		test -n "${MPL}" && \
 		MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
@@ -44,16 +46,22 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
 		MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
 		test -n "$MA" || continue # matching assignment
+		test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; ${MA}"  
 		#echo $MD/${MF}
 		test "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
 				test -z "`module avail ${RM} 2>&1`" && \
-					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}";
+					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}"; 
 			done
 			continue; }
 		for PD in ${MV//:/ }; do # path directory
-			test -d ${PD} || echo "module ${MN} [${FN}] ${MC} ${MI} \"${PD}\" not a directory!${EI}";
+			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"${PD}\" not a directory!${EI}" && ERRORS=$((ERRORS+1)); } 
 		done; 
 	done;
 done    ; 
 done	;
+if test ${ERRORS} != 0; then
+	echo "Found ${ERRORS} errors".
+	exit -1 # failure
+fi
+exit # success
