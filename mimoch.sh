@@ -1,5 +1,5 @@
 #!/bin/bash
-#Modules checking script -- for internal use -- please do not distribute.
+#Modules checking script -- INCOMPLETE, FOR PERSONAL USE -- please do not distribute.
 #Author: Michele Martone
 #module purge || exit
 #set -x
@@ -34,8 +34,9 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	EI=''
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra info
 	test ${VERBOSE} == 1 && echo "Checking ${FN}"
+	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
 	for PVID in \
-		'\(pre\|ap\)pend-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>' 'setenv .*_DOC\>' \
+		'\(pre\|ap\)pend-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>' \
 		'prereq .*' \
 		; do # path variable identifier expressions
 		#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
