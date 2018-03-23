@@ -10,7 +10,7 @@ USER_MP="$1"
 MY_MODULEPATH=${1:-$MODULEPATH}
 test -f ${MY_MODULEPATH} && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
 PATTERN=${2:-$PATTERN}
-${VERBOSE:=0}
+VERBOSE=${VERBOSE:-0}
 which grep || exit
 which sed || exit
 ERRORS=0
