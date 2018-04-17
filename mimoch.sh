@@ -16,7 +16,7 @@ which sed || exit
 ERRORS=0
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
 for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
-test ${VERBOSE} == 1 && echo looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
+test ${VERBOSE} -ge 1 && echo Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
 cd ${MD}
 for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	FN=${MD}/${MF}
@@ -33,7 +33,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	CL=`echo ${CI} | sed "s/\(${NRE}\)\\+\(${ERE}\)/\2 /g"`
 	EI=''
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra info
-	test ${VERBOSE} == 1 && echo "Checking ${FN}"
+	test ${VERBOSE} -ge 1 && echo "Checking ${FN}"
 	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
 	for PVID in \
 		'\(pre\|ap\)pend-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>' \
@@ -47,18 +47,21 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
 		MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
 		test -n "$MA" || continue # matching assignment
-		test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; ${MA}"  
+		test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
 		#echo $MD/${MF}
 		test "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
+				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
 				test -z "`module avail ${RM} 2>&1`" && \
 					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}"; 
 			done
 			continue; }
 		for PD in ${MV//:/ }; do # path directory
-			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"${PD}\" not a directory!${EI}" && ERRORS=$((ERRORS+1)); } 
+			test "${VERBOSE}" -ge 3 && echo "Checking if $MI is a dir: $PD"  
+			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && ERRORS=$((ERRORS+1)); } 
 		done; 
 	done;
+	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
 done    ; 
 done	;
 if test ${ERRORS} != 0; then
