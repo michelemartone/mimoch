@@ -11,8 +11,9 @@ MY_MODULEPATH=${1:-$MODULEPATH}
 test -f ${MY_MODULEPATH} && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
 PATTERN=${2:-$PATTERN}
 VERBOSE=${VERBOSE:-0}
-which grep || exit
-which sed || exit
+WHATTOCHECK='d'
+which grep >/dev/null|| exit
+which sed  >/dev/null|| exit
 ERRORS=0
 #set -x
 declare -a VIDP
@@ -42,6 +43,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra info
 	test ${VERBOSE} -ge 1 && echo "Checking ${FN}"
 	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
+	#if [[ "$WHATTOCHECK" =~ d ]]; then fi;
 	for PVID in "${VIDP[@]}" ;
 		do # path variable identifier expressions
 		#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
@@ -70,7 +72,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 done    ; 
 done	;
 if test ${ERRORS} != 0; then
-	echo "Found ${ERRORS} errors".
+	echo "Found ${ERRORS} errors. Took ${SECONDS}s".
 	exit -1 # failure
 fi
 exit # success
