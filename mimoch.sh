@@ -23,6 +23,10 @@ if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
 if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
 if [[ "$DIRSTOCHECK" =~ b ]]; then VIDP+=('setenv .*BASE\>'); fi;
 #
+function module_avail()
+{
+	module avail ${1} 2>&1 | grep -v ^---
+}
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
 for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
 test ${VERBOSE} -ge 1 && echo Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
@@ -33,7 +37,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	grep -l '#%Module' 2>&1 >/dev/null ${MF}  || continue # skip non-module files
 	#MN=`echo ${MF} | sed 's/\s\s*/ /g' | rev | awk  -F / '{print $1"/"$2 }'| rev` # module name
 	MN=${MF}
-	MO="`module avail ${MN} 2>&1`"
+	MO="`module_avail ${MN}`"
 	#test -z "${MO}" && { echo "internal error with module avail ${MN}: ${MF}!"; exit 1; } # we assert module to be valid
 	if test ! -f "${USER_MP}" ; then test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; }; fi # e.g. tempdir/1.0~
 	CI=`grep @ ${MF} || true` 
@@ -59,7 +63,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		test "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
 				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
-				test -z "`module avail ${RM} 2>&1`" && \
+				test -z "`module_avail ${RM} 2>&1`" && \
 					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}"; 
 			done
 			continue; }
