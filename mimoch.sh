@@ -15,6 +15,12 @@ which grep || exit
 which sed || exit
 ERRORS=0
 #set -x
+declare -a VIDP
+VIDP+=('\(pre\|ap\)pend-path .*PATH\>')
+VIDP+=('setenv .*DIR\>')
+VIDP+=('setenv .*_SRC\>')
+VIDP+=('setenv .*BASE\>')
+VIDP+=('prereq .*')
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
 for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
 test ${VERBOSE} -ge 1 && echo Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
@@ -36,10 +42,8 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra info
 	test ${VERBOSE} -ge 1 && echo "Checking ${FN}"
 	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
-	for PVID in \
-		'\(pre\|ap\)pend-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>' \
-		'prereq .*' \
-		; do # path variable identifier expressions
+	for PVID in "${VIDP[@]}" ;
+		do # path variable identifier expressions
 		#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
 		MPL="`module show ${PWD}/${MF} 2>&1 | sed 's/\s\s*/ /g' | grep "^${PVID} .*$" | grep -v '^\(--\|module-whatis\|  *\)'  `" && \
 		test -n "${MPL}" && \
