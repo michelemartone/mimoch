@@ -11,17 +11,18 @@ MY_MODULEPATH=${1:-$MODULEPATH}
 test -f ${MY_MODULEPATH} && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
 PATTERN=${2:-$PATTERN}
 VERBOSE=${VERBOSE:-0}
-WHATTOCHECK='d'
+DIRSTOCHECK='pPdsb'
 which grep >/dev/null|| exit
 which sed  >/dev/null|| exit
 ERRORS=0
 #set -x
 declare -a VIDP
-VIDP+=('\(pre\|ap\)pend-path .*PATH\>')
-VIDP+=('setenv .*DIR\>')
-VIDP+=('setenv .*_SRC\>')
-VIDP+=('setenv .*BASE\>')
-VIDP+=('prereq .*')
+if [[ "$DIRSTOCHECK" =~ P ]]; then VIDP+=('prereq .*'); fi;
+if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
+if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
+if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
+if [[ "$DIRSTOCHECK" =~ b ]]; then VIDP+=('setenv .*BASE\>'); fi;
+#
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
 for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
 test ${VERBOSE} -ge 1 && echo Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
@@ -43,7 +44,6 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra info
 	test ${VERBOSE} -ge 1 && echo "Checking ${FN}"
 	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
-	#if [[ "$WHATTOCHECK" =~ d ]]; then fi;
 	for PVID in "${VIDP[@]}" ;
 		do # path variable identifier expressions
 		#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
