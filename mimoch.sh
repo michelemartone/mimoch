@@ -3,8 +3,8 @@
 #Author: Michele Martone
 #module purge || exit
 #set -x
-#set -e
-module unload lrz/$USER 
+set -e
+if module whatis lrz/$USER 2>&1 > /dev/null ; then module unload lrz/$USER ; else true; fi
 module load admin lrz/default 
 USER_MP="$1"
 MY_MODULEPATH=${1:-$MODULEPATH}
@@ -14,6 +14,7 @@ VERBOSE=${VERBOSE:-0}
 which grep || exit
 which sed || exit
 ERRORS=0
+#set -x
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
 for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
 test ${VERBOSE} -ge 1 && echo Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
@@ -27,7 +28,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	MO="`module avail ${MN} 2>&1`"
 	#test -z "${MO}" && { echo "internal error with module avail ${MN}: ${MF}!"; exit 1; } # we assert module to be valid
 	if test ! -f "${USER_MP}" ; then test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; }; fi # e.g. tempdir/1.0~
-	CI=`grep @ ${MF}` 
+	CI=`grep @ ${MF} || true` 
 	ERE='[a-zA-Z.]\+@lrz.de'
 	NRE='[^@]\+\s\+'
 	CL=`echo ${CI} | sed "s/\(${NRE}\)\\+\(${ERE}\)/\2 /g"`
