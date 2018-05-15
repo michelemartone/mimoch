@@ -93,6 +93,12 @@ if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
 if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
 if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
 if [[ "$DIRSTOCHECK" =~ b ]]; then VIDP+=('setenv .*BASE\>'); fi;
+function mlamu_test()
+{
+		test -n "$1"
+		CMD="( cd && module load ${MN} && eval ${1} && module unload ${MN}; )"
+		eval "${CMD}" || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && MERRORS=$((MERRORS+1)); } 
+}
 function check_on_ptn()
 {
 	CHK="$1"
@@ -118,9 +124,8 @@ function check_on_ptn()
 			MV="`echo ${MPL} | cut -d \  -f 3- `" # this tolerates spaces
 			test "${VERBOSE}" -ge 3 && \
 				echo "Module $MN offers test commands variable $MI, defined as $MV"
-			CMD="( cd && module load ${MN} && eval \${$MI} && module unload ${MN}; )"
-			echo CMD $CMD
-			eval "${CMD}" || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && MERRORS=$((MERRORS+1)); } 
+			#echo CMD $CMD
+			mlamu_test "\${$MI}"
 		;; 
 		MEX)
 		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
@@ -161,8 +166,7 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 	fi
 	if [[ "$MISCTOCHECK" =~ l ]] ; then
 		test ${VERBOSE} -ge 3 && echo "Checking load/unload ${FN}"
-		CMD="( cd && module load ${MN} && module unload ${MN}; )"
-		eval "${CMD}" || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && MERRORS=$((MERRORS+1)); } 
+		mlamu_test true
 	fi
 	test $MERRORS = 0 || { ERRORS=$((ERRORS+MERRORS)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
