@@ -17,11 +17,15 @@ LMC_HELP="Usage:
     $0 [options] <module-name>                               # check modulefiles for specific module
     $0 [options] <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
     Where [options] are:
-     -d SPECSTRING # check existence of specified directories (default: ${DEF_DIRSTOCHECK})
-     -h # print help and exit
-     -v # verbose (specify up to 4 times to increase verbosity)
-     -X # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
-     -L # load / unload test
+     -d SPECSTRING # check existence of specified directories. By default: ${DEF_DIRSTOCHECK}, where
+                   # p: check .*PATH variables
+                   # d: check .*DIR  variables
+                   # s: check .*_SRC variables
+                   # b: check .*BASE variables
+     -h            # print help and exit
+     -v            # verbose (specify up to 4 times to increase verbosity)
+     -X            # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
+     -L            # load / unload test
 
 Will look for common mistakes in modulefiles.
 It assumes output of \`module show\` to be sound in the current environment.
@@ -48,6 +52,12 @@ while getopts $OPTSTRING NAME; do
 done
 shift $((OPTIND-1))
 ERRORS=0
+declare -a VIDP
+if [[ "$DIRSTOCHECK" =~ P ]]; then VIDP+=('prereq .*'); fi;
+if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
+if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
+if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
+if [[ "$DIRSTOCHECK" =~ b ]]; then VIDP+=('setenv .*BASE\>'); fi;
 declare -a MRA # modulefiles responsabilities array
 declare -a MFA # modulefiles array
 declare -a MDA # modulefiles dir array
@@ -90,12 +100,6 @@ else
 	done
 fi
 #set -x
-declare -a VIDP
-if [[ "$DIRSTOCHECK" =~ P ]]; then VIDP+=('prereq .*'); fi;
-if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
-if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
-if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
-if [[ "$DIRSTOCHECK" =~ b ]]; then VIDP+=('setenv .*BASE\>'); fi;
 function mlamu_test()
 {
 		test -n "$1"
