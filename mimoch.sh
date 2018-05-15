@@ -37,8 +37,8 @@ while getopts $OPTSTRING NAME; do
 		#a) CHECK_WHAT='a';;
 		h) on_help;;
 		v) VERBOSE=$((VERBOSE+1));;
-		X) MISCTOCHECK="${MISCTOCHECK}X";;
-		L) MISCTOCHECK="${MISCTOCHECK}L";;
+		X) MISCTOCHECK+="X";;
+		L) MISCTOCHECK+="L";;
 		*) false
 	esac
 done
