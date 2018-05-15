@@ -134,7 +134,7 @@ function check_on_ptn()
 				echo "Module $MN offers test commands variable $MI, defined as $MV"
 			CMD="( cd && module load ${MN} && eval \${$MI} && module unload ${MN}; )"
 			echo CMD $CMD
-			eval "${CMD}"
+			eval "${CMD}" || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && MERRORS=$((MERRORS+1)); } 
 		;; 
 		MEX)
 		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
