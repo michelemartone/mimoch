@@ -48,6 +48,7 @@ DIRSTOCHECK='pPdsb'
 ERRORS=0
 declare -a MRA # modulefiles responsabilities array
 declare -a MFA # modulefiles array
+declare -a MNA # modulefiles names array (indices as in MFA)
 declare -a FMA # faulty modulefiles array
 if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
 	true
@@ -67,11 +68,13 @@ else
 		#test -z "${MO}" && { echo "internal error with module avail ${MN}: ${MF}!"; exit 1; } # we assert module to be valid
 		if test ! -f "${USER_MP}" ; then test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; }; fi # e.g. tempdir/1.0~
 		MFA+=(${FN});
+		MNA+=(${MN});
 	done
 	done
 	for MFI in `seq 1 ${#MFA[@]}` ;do 
-		MF="${MFA[$MFI]}" ;
-		echo "# Will check modulefile ${MF}"
+		FN="${MFA[$MFI]}" ;
+		MN="${MNA[$MFI]}" ;
+		echo "# Will check module ${MN}, modulefile ${FN}"
 	done
 fi
 #set -x
