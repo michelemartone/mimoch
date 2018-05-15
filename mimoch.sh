@@ -116,8 +116,7 @@ function check_on_ptn()
 	MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
 	# path variable identifier expressions
 	MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
-	#MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
-	MV="`echo ${MPL} | cut -d \  -f 3- `" && \
+	MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
 	MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
 	test -n "$MA" || continue # matching assignment
 	test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
@@ -130,6 +129,7 @@ function check_on_ptn()
 		done; 
 		;; 
 		EXT)
+			MV="`echo ${MPL} | cut -d \  -f 3- `" # this tolerates spaces
 			test "${VERBOSE}" -ge 3 && \
 				echo "Module $MN offers test commands variable $MI, defined as $MV"
 			CMD="( cd && module load ${MN} && eval \${$MI} && module unload ${MN}; )"
