@@ -47,6 +47,7 @@ VERBOSE=${VERBOSE:-0}
 DIRSTOCHECK='pPdsb'
 ERRORS=0
 declare -a MFA # modulefiles array
+declare -a FMA # faulty modulefiles array
 if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
 	true
 	#echo "# Will check through module $AM" # not yet active
@@ -100,6 +101,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra info
 	test ${VERBOSE} -ge 1 && echo "Checking ${FN}"
 	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
+	MERRORS=0;
 	for PVID in "${VIDP[@]}" ;
 		do # path variable identifier expressions
 		#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
@@ -121,14 +123,15 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 			continue; }
 		for PD in ${MV//:/ }; do # path directory
 			test "${VERBOSE}" -ge 3 && echo "Checking if $MI is a dir: $PD"  
-			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && ERRORS=$((ERRORS+1)); } 
+			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && MERRORS=$((MERRORS+1)); } 
 		done; 
 	done;
+	test $MERRORS = 0 || { ERRORS=$((ERRORS+MERRORS)); FMA+=(${FN}); }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
 done    ; 
 done	;
 if test ${ERRORS} != 0; then
-	echo "Checked ${#MFA[@]} modulefiles. Found ${ERRORS} errors. Took ${SECONDS}s".
+	echo "Checked ${#MFA[@]} modulefiles. Found ${ERRORS} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
 	exit -1 # failure
 fi
 exit # success
