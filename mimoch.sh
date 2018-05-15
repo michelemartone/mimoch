@@ -44,11 +44,30 @@ PATTERN=${2:-$PATTERN}
 VERBOSE=${VERBOSE:-0}
 DIRSTOCHECK='pPdsb'
 ERRORS=0
+#declare -a MFA # modulefiles array
 if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
 	true
 	#echo "# Will check through module $AM" # not yet active
 else
 	echo "# Will check through modules around ${MY_MODULEPATH}"
+	for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
+	test ${VERBOSE} -ge 1 && echo Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
+	cd ${MD}
+	for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
+		FN=${MD}/${MF}
+		bn=`basename ${MF}`; test ${bn:0:1} = . && continue # no hidden files
+		grep -l '#%Module' 2>&1 >/dev/null ${MF}  || continue # skip non-module files
+		#MN=`echo ${MF} | sed 's/\s\s*/ /g' | rev | awk  -F / '{print $1"/"$2 }'| rev` # module name
+		MN=${MF}
+		MO="`module_avail ${MN}`"
+		#test -z "${MO}" && { echo "internal error with module avail ${MN}: ${MF}!"; exit 1; } # we assert module to be valid
+		if test ! -f "${USER_MP}" ; then test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; }; fi # e.g. tempdir/1.0~
+		MFA+=(${FN});
+	done
+	done
+	for MF in "${MFA[@]}" ;do 
+		echo "# Will check modulefile ${MF}"
+	done
 fi
 #set -x
 declare -a VIDP
