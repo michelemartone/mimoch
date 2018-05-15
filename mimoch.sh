@@ -1,14 +1,10 @@
 #!/bin/bash
-#Modules checking script -- INCOMPLETE, FOR PERSONAL USE -- please do not distribute.
+#A modulefiles checking script -- INCOMPLETE, FOR PERSONAL USE -- please do not distribute.
 #Author: Michele Martone
-#module purge || exit
 #set -x
 set -e
 which grep >/dev/null|| exit
 which sed  >/dev/null|| exit
-if module whatis lrz/$USER 2>&1 > /dev/null ; then module unload lrz/$USER ; else true; fi
-module load admin lrz/default 
-#
 function module_avail()
 {
 	module avail ${1} 2>&1 | grep -v ^---
@@ -45,11 +41,6 @@ while getopts $OPTSTRING NAME; do
 	esac
 done
 shift $((OPTIND-1))
-#test $# = 0 -a -z "$CHECK_WHAT" && on_help
-#echo "$1"
-#AM=`module_avail $1`
-#	echo boo: $AM
-#
 DIRSTOCHECK='pPdsb'
 ERRORS=0
 declare -a MRA # modulefiles responsabilities array
@@ -92,11 +83,6 @@ else
 		# echo "# Will check module ${MN}, modulefile ${FN}"
 	done
 	done
-	#for MFI in `seq 1 $((${#MFA[@]}-1))`; do 
-	#	FN="${MFA[$MFI]}" ;
-	#	MN="${MNA[$MFI]}" ;
-	#	MD="${MDA[$MFI]}" ;
-	#done
 fi
 #set -x
 declare -a VIDP
@@ -105,7 +91,6 @@ if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
 if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
 if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
 if [[ "$DIRSTOCHECK" =~ b ]]; then VIDP+=('setenv .*BASE\>'); fi;
-#MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
 function check_on_ptn()
 {
 	CHK="$1"
@@ -120,7 +105,6 @@ function check_on_ptn()
 	MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
 	test -n "$MA" || continue # matching assignment
 	test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
-	#echo $MD/${MN}
 	case $CHK in
 		DIR)
 		for PD in ${MV//:/ }; do # path directory
@@ -180,9 +164,7 @@ if test ${ERRORS} != 0; then
 	echo "Checked ${#MFA[@]} modulefiles. Detected ${ERRORS} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
 	if test -n "${CL}" ; then echo "Modules mention email addresses: ${CL}."; fi
-	#for MR in "${MRA[@]}" ; do
-	#	echo Contact: ${MR}
-	#done
+	#for MR in "${MRA[@]}" ; do echo Contact: ${MR}; done
 	exit -1 # failure
 fi
 exit # success
