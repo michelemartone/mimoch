@@ -37,8 +37,8 @@ while getopts $OPTSTRING NAME; do
 		#a) CHECK_WHAT='a';;
 		h) on_help;;
 		v) VERBOSE=$((VERBOSE+1));;
-		X) MISCTOCHECK="${MISCTOCHECK}t";;
-		L) MISCTOCHECK="${MISCTOCHECK}l";;
+		X) MISCTOCHECK="${MISCTOCHECK}X";;
+		L) MISCTOCHECK="${MISCTOCHECK}L";;
 		*) false
 	esac
 done
@@ -161,10 +161,10 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 		check_on_ptn DIR "$PVID"; continue
 		check_on_ptn MEX "$PVID"; continue
 	done;
-	if [[ "$MISCTOCHECK" =~ t ]] ; then
+	if [[ "$MISCTOCHECK" =~ X ]] ; then
 		check_on_ptn EXT 'setenv .*_USER_TEST\>'
 	fi
-	if [[ "$MISCTOCHECK" =~ l ]] ; then
+	if [[ "$MISCTOCHECK" =~ L ]] ; then
 		test ${VERBOSE} -ge 3 && echo "Checking load/unload ${FN}"
 		mlamu_test true
 	fi
