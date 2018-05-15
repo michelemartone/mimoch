@@ -10,12 +10,14 @@ function module_avail()
 	module avail ${1} 2>&1 | grep -v ^---
 	true # rather than $? use test -n "`module_avail modulename`" here
 }
+DEF_DIRSTOCHECK='pPdsb'
 LMC_HELP="Usage:
 
     $0 [options] <full-modulefile-pathname>                  # check specified modulefile
     $0 [options] <module-name>                               # check modulefiles for specific module
     $0 [options] <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
     Where [options] are:
+     -d SPECSTRING # check existence of specified directories (default: ${DEF_DIRSTOCHECK})
      -h # print help and exit
      -v # verbose (specify up to 4 times to increase verbosity)
      -X # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
@@ -27,11 +29,12 @@ Note that mistakes might be detected twice.
 False positives are also possible in certain cases.
 "
 function on_help() { echo "${LMC_HELP}";exit; }
-OPTSTRING="hvLX"
+OPTSTRING="d:hvLX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 MISCTOCHECK=''
+DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
 	case $NAME in
 		#a) CHECK_WHAT='a';;
@@ -39,11 +42,11 @@ while getopts $OPTSTRING NAME; do
 		v) VERBOSE=$((VERBOSE+1));;
 		X) MISCTOCHECK+="X";;
 		L) MISCTOCHECK+="L";;
+		d)DIRSTOCHECK="$OPTARG";;
 		*) false
 	esac
 done
 shift $((OPTIND-1))
-DIRSTOCHECK='pPdsb'
 ERRORS=0
 declare -a MRA # modulefiles responsabilities array
 declare -a MFA # modulefiles array
