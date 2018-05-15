@@ -46,7 +46,7 @@ PATTERN=${2:-$PATTERN}
 VERBOSE=${VERBOSE:-0}
 DIRSTOCHECK='pPdsb'
 ERRORS=0
-declare -a MRA # modulefiles responsibilities array
+declare -a MRA # modulefiles responsabilities array
 declare -a MFA # modulefiles array
 declare -a FMA # faulty modulefiles array
 if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
@@ -133,7 +133,9 @@ done    ;
 done	;
 if test ${ERRORS} != 0; then
 	echo "Checked ${#MFA[@]} modulefiles. Found ${ERRORS} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
-	for MR in "${MRA[@]}" ; do echo "Contact: ${MR}"; done
+	for MR in "${MRA[@]}" ; do
+		echo Contact: ${MR}
+	done
 	exit -1 # failure
 fi
 exit # success
