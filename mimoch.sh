@@ -14,16 +14,28 @@ function module_avail()
 	module avail ${1} 2>&1 | grep -v ^---
 	true # rather than $? use test -n "`module_avail modulename`" here
 }
+LMC_HELP="
+Usage:
+
+    $0 <full-modulefile-pathname>
+    $0 <modulefiles-dirpath> <filter-find-pattern>
+"
+function on_help() { echo "${LMC_HELP}";exit; }
+OPTSTRING="h"
+#OPTSTRING="ah"
+#CHECK_WHAT='';
+while getopts $OPTSTRING NAME; do
+	case $NAME in
+		#a) CHECK_WHAT='a';;
+		h) on_help;;
+		*) false
+	esac
+done
+shift $((OPTIND-1))
+#test $# = 0 -a -z "$CHECK_WHAT" && on_help
 #echo "$1"
 #AM=`module_avail $1`
 #	echo boo: $AM
-if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
-	true
-	#echo first arg is (at least) a module: $AM, assuming rest too.
-else
-	true
-	#echo first arg is not a module
-fi
 #
 USER_MP="$1"
 MY_MODULEPATH=${1:-$MODULEPATH}
@@ -32,6 +44,12 @@ PATTERN=${2:-$PATTERN}
 VERBOSE=${VERBOSE:-0}
 DIRSTOCHECK='pPdsb'
 ERRORS=0
+if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
+	true
+	#echo "# Will check through module $AM" # not yet active
+else
+	echo "# Will check through modules around ${MY_MODULEPATH}"
+fi
 #set -x
 declare -a VIDP
 if [[ "$DIRSTOCHECK" =~ P ]]; then VIDP+=('prereq .*'); fi;
