@@ -155,7 +155,7 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 	# echo "# Will check module ${MN}, modulefile ${FN}"
 	cd ${MD}
 	CI=`grep @ ${MN} || true` 
-	ERE='[a-zA-Z.]\+@lrz.de'
+	ERE='[a-zA-Z.]\+@[a-zA-Z]\+.[a-zA-Z]\+'
 	NRE='[^@]\+\s\+'
 	CL=`echo ${CI} | sed "s/\(${NRE}\)\\+\(${ERE}\)/\2 /g"`
 	EI=''
