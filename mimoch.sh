@@ -46,7 +46,7 @@ PATTERN=${2:-$PATTERN}
 VERBOSE=${VERBOSE:-0}
 DIRSTOCHECK='pPdsb'
 ERRORS=0
-#declare -a MFA # modulefiles array
+declare -a MFA # modulefiles array
 if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
 	true
 	#echo "# Will check through module $AM" # not yet active
@@ -67,7 +67,8 @@ else
 		MFA+=(${FN});
 	done
 	done
-	for MF in "${MFA[@]}" ;do 
+	for MFI in `seq 1 ${#MFA[@]}` ;do 
+		MF="${MFA[$MFI]}" ;
 		echo "# Will check modulefile ${MF}"
 	done
 fi
