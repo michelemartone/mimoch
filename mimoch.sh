@@ -10,7 +10,8 @@ function module_avail()
 	module avail ${1} 2>&1 | grep -v ^---
 	true # rather than $? use test -n "`module_avail modulename`" here
 }
-DEF_DIRSTOCHECK='pPdsb'
+DEF_DIRSTOCHECK='bdps'
+#DEF_DIRSTOCHECK='bdpPs'
 LMC_HELP="Usage:
 
     $0 [options] <full-modulefile-pathname>                  # check specified modulefile
@@ -46,14 +47,14 @@ while getopts $OPTSTRING NAME; do
 		v) VERBOSE=$((VERBOSE+1));;
 		X) MISCTOCHECK+="X";;
 		L) MISCTOCHECK+="L";;
-		d)DIRSTOCHECK="$OPTARG";;
+		d) DIRSTOCHECK="$OPTARG";;
 		*) false
 	esac
 done
 shift $((OPTIND-1))
 ERRORS=0
 declare -a VIDP
-if [[ "$DIRSTOCHECK" =~ P ]]; then VIDP+=('prereq .*'); fi;
+#if [[ "$DIRSTOCHECK" =~ P ]]; then VIDP+=('prereq .*'); fi;
 if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
 if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
 if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
