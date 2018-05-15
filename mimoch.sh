@@ -52,8 +52,10 @@ declare -a MDA # modulefiles dir array
 declare -a MNA # modulefiles names array (indices as in MFA)
 declare -a FMA # faulty modulefiles array
 if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
-	true
 	#echo "# Will check through module $AM" # not yet active
+	echo "# Specified $1, addressing modules: $AM " # not yet active
+	echo "# Syntax of checking module files by their module names not supported yet!" # not yet active
+	exit -1
 else
 	echo "# Will check through modules around ${MY_MODULEPATH}"
 	for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
