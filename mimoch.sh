@@ -48,6 +48,8 @@ shift $((OPTIND-1))
 #	echo boo: $AM
 #
 DIRSTOCHECK='pPdsb'
+MISCTOCHECK=''
+#MISCTOCHECK='t'
 ERRORS=0
 declare -a MRA # modulefiles responsabilities array
 declare -a MFA # modulefiles array
@@ -113,7 +115,8 @@ function check_on_ptn()
 	MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
 	# path variable identifier expressions
 	MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
-	MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
+	#MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
+	MV="`echo ${MPL} | cut -d \  -f 3- `" && \
 	MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
 	test -n "$MA" || continue # matching assignment
 	test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
@@ -124,6 +127,13 @@ function check_on_ptn()
 			test "${VERBOSE}" -ge 3 && echo "Checking if $MI is a dir: $PD"  
 			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && MERRORS=$((MERRORS+1)); } 
 		done; 
+		;; 
+		EXT)
+			test "${VERBOSE}" -ge 3 && \
+				echo "Module $MN offers test commands variable $MI, defined as $MV"
+			CMD="( cd && module load ${MN} && eval \${$MI} && module unload ${MN}; )"
+			echo CMD $CMD
+			eval "${CMD}"
 		;; 
 		MEX)
 		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
@@ -154,12 +164,14 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 	test "${VERBOSE}" -ge 4 && module show ${PWD}/${MN}
 	MERRORS=0;
 	MS=`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep -v '^\(--\|module-whatis\|  *\)'  `
-
 	for PVID in "${VIDP[@]}" ;
 		do
 		check_on_ptn DIR "$PVID"; continue
 		check_on_ptn MEX "$PVID"; continue
 	done;
+	if [[ "$MISCTOCHECK" =~ t ]] ; then
+		check_on_ptn EXT 'setenv .*USER_TEST\>'
+	fi
 	test $MERRORS = 0 || { ERRORS=$((ERRORS+MERRORS)); FMA+=(${FN}); MRA+=("${CL/% /} ${FN}"); }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
 done    ; 
