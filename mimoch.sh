@@ -24,13 +24,15 @@ Will look for common mistakes in modulefiles.
 It assumes output of \`module show\` to be sound without further context.
 "
 function on_help() { echo "${LMC_HELP}";exit; }
-OPTSTRING="h"
+OPTSTRING="hv"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
+VERBOSE=${VERBOSE:-0}
 while getopts $OPTSTRING NAME; do
 	case $NAME in
 		#a) CHECK_WHAT='a';;
 		h) on_help;;
+		v) VERBOSE=$((VERBOSE+1));;
 		*) false
 	esac
 done
@@ -40,7 +42,6 @@ shift $((OPTIND-1))
 #AM=`module_avail $1`
 #	echo boo: $AM
 #
-VERBOSE=${VERBOSE:-0}
 DIRSTOCHECK='pPdsb'
 ERRORS=0
 declare -a MRA # modulefiles responsabilities array
