@@ -14,11 +14,13 @@ function module_avail()
 	module avail ${1} 2>&1 | grep -v ^---
 	true # rather than $? use test -n "`module_avail modulename`" here
 }
-LMC_HELP="
-Usage:
+LMC_HELP="Usage:
 
-    $0 <full-modulefile-pathname>
-    $0 <modulefiles-dirpath> <filter-find-pattern>
+    $0 <full-modulefile-pathname>                  # check specified modulefile
+    $0 <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
+
+Will look for common mistakes in modulefiles.
+It assumes output of \`module show\` to be sound without further context.
 "
 function on_help() { echo "${LMC_HELP}";exit; }
 OPTSTRING="h"
