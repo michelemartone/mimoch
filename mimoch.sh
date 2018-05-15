@@ -12,6 +12,7 @@ module load admin lrz/default
 function module_avail()
 {
 	module avail ${1} 2>&1 | grep -v ^---
+	true # rather than $? use test -n "`module_avail modulename`" here
 }
 #echo "$1"
 #AM=`module_avail $1`
