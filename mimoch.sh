@@ -132,7 +132,7 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 			for RM in ${MI} ${MV}  ; do
 				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
 				test -z "`module_avail ${RM} 2>&1`" && \
-					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}"; 
+					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}" && MERRORS=$((MERRORS+1)); 
 			done
 			continue; }
 		for PD in ${MV//:/ }; do # path directory
