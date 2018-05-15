@@ -4,16 +4,32 @@
 #module purge || exit
 #set -x
 set -e
+which grep >/dev/null|| exit
+which sed  >/dev/null|| exit
 if module whatis lrz/$USER 2>&1 > /dev/null ; then module unload lrz/$USER ; else true; fi
 module load admin lrz/default 
+#
+function module_avail()
+{
+	module avail ${1} 2>&1 | grep -v ^---
+}
+#echo "$1"
+#AM=`module_avail $1`
+#	echo boo: $AM
+if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
+	true
+	#echo first arg is (at least) a module: $AM, assuming rest too.
+else
+	true
+	#echo first arg is not a module
+fi
+#
 USER_MP="$1"
 MY_MODULEPATH=${1:-$MODULEPATH}
 test -f ${MY_MODULEPATH} && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
 PATTERN=${2:-$PATTERN}
 VERBOSE=${VERBOSE:-0}
 DIRSTOCHECK='pPdsb'
-which grep >/dev/null|| exit
-which sed  >/dev/null|| exit
 ERRORS=0
 #set -x
 declare -a VIDP
@@ -22,11 +38,6 @@ if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
 if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
 if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
 if [[ "$DIRSTOCHECK" =~ b ]]; then VIDP+=('setenv .*BASE\>'); fi;
-#
-function module_avail()
-{
-	module avail ${1} 2>&1 | grep -v ^---
-}
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
 for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
 test ${VERBOSE} -ge 1 && echo Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
