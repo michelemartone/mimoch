@@ -157,7 +157,7 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 	if [[ "$MISCTOCHECK" =~ t ]] ; then
 		check_on_ptn EXT 'setenv .*_USER_TEST\>'
 	fi
-	test $MERRORS = 0 || { ERRORS=$((ERRORS+MERRORS)); FMA+=(${FN}); MRA+=("${CL/% /} ${FN}"); }
+	test $MERRORS = 0 || { ERRORS=$((ERRORS+MERRORS)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
 done    ; 
 if test ${ERRORS} != 0; then
