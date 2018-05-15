@@ -16,12 +16,15 @@ function module_avail()
 }
 LMC_HELP="Usage:
 
-    $0 <full-modulefile-pathname>                  # check specified modulefile
-    $0 <module-name>                               # check modulefiles for specific module
-    $0 <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
+    $0 [options] <full-modulefile-pathname>                  # check specified modulefile
+    $0 [options] <module-name>                               # check modulefiles for specific module
+    $0 [options] <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
+    Where [options] are:
+     -h # print help and exit
+     -v # verbose (specify multiple times to increase verbosity)
 
 Will look for common mistakes in modulefiles.
-It assumes output of \`module show\` to be sound without further context.
+It assumes output of \`module show\` to be sound in the current environment.
 "
 function on_help() { echo "${LMC_HELP}";exit; }
 OPTSTRING="hv"
