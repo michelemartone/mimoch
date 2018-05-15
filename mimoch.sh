@@ -101,11 +101,15 @@ else
 	done
 fi
 #set -x
+function inc_err_cnt()
+{
+	MERRORS=$((MERRORS+1));
+}
 function mlamu_test()
 {
 		test -n "$1"
 		CMD="( cd && module load ${MN} && eval ${1} && module unload ${MN}; )"
-		eval "${CMD}" || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && MERRORS=$((MERRORS+1)); } 
+		eval "${CMD}" || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt; } 
 }
 function check_on_ptn()
 {
@@ -125,7 +129,7 @@ function check_on_ptn()
 		DIR)
 		for PD in ${MV//:/ }; do # path directory
 			test "${VERBOSE}" -ge 3 && echo "Checking if $MI is a dir: $PD"  
-			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && MERRORS=$((MERRORS+1)); } 
+			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt; } 
 		done; 
 		;; 
 		EXT)
@@ -140,7 +144,7 @@ function check_on_ptn()
 			for RM in ${MI} ${MV}  ; do
 				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
 				test -z "`module_avail ${RM} 2>&1`" && \
-					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}" && MERRORS=$((MERRORS+1)); 
+					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}" && inc_err_cnt; 
 			done
 			}
 		;; 
