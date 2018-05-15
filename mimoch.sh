@@ -117,10 +117,11 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
 	test "${VERBOSE}" -ge 4 && module show ${PWD}/${MN}
 	MERRORS=0;
+	MS=`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep -v '^\(--\|module-whatis\|  *\)'  `
 	for PVID in "${VIDP[@]}" ;
 		do # path variable identifier expressions
 		#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
-		MPL="`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep "^${PVID} .*$" | grep -v '^\(--\|module-whatis\|  *\)'  `" && \
+		MPL=`echo "$MS" | grep "^${PVID} .*$"` && \
 		test -n "${MPL}" && \
 		MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
 		MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
