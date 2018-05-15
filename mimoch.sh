@@ -25,6 +25,8 @@ LMC_HELP="Usage:
 
 Will look for common mistakes in modulefiles.
 It assumes output of \`module show\` to be sound in the current environment.
+Note that mistakes might be detected twice.
+False positives are also possible in certain cases.
 "
 function on_help() { echo "${LMC_HELP}";exit; }
 OPTSTRING="hv"
@@ -130,7 +132,7 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 		test -n "$MA" || continue # matching assignment
 		test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
 		#echo $MD/${MN}
-		test "${MC}" == 'prereq' && { \
+		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
 				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
 				test -z "`module_avail ${RM} 2>&1`" && \
