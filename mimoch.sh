@@ -71,13 +71,13 @@ else
 		MFA+=(${FN});
 		MNA+=(${MN});
 		MDA+=(${MD});
+		# echo "# Will check module ${MN}, modulefile ${FN}"
 	done
 	done
-	for MFI in `seq 1 ${#MFA[@]}` ;do 
+	for MFI in `seq 1 $((${#MFA[@]}-1))`; do 
 		FN="${MFA[$MFI]}" ;
 		MN="${MNA[$MFI]}" ;
 		MD="${MDA[$MFI]}" ;
-		echo "# Will check module ${MN}, modulefile ${FN}"
 	done
 fi
 #set -x
@@ -88,19 +88,13 @@ if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
 if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
 if [[ "$DIRSTOCHECK" =~ b ]]; then VIDP+=('setenv .*BASE\>'); fi;
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
-for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
-test ${VERBOSE} -ge 1 && echo Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
-cd ${MD}
-for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
-	FN=${MD}/${MF}
-	bn=`basename ${MF}`; test ${bn:0:1} = . && continue # no hidden files
-	grep -l '#%Module' 2>&1 >/dev/null ${MF}  || continue # skip non-module files
-	#MN=`echo ${MF} | sed 's/\s\s*/ /g' | rev | awk  -F / '{print $1"/"$2 }'| rev` # module name
-	MN=${MF}
-	MO="`module_avail ${MN}`"
-	#test -z "${MO}" && { echo "internal error with module avail ${MN}: ${MF}!"; exit 1; } # we assert module to be valid
-	if test ! -f "${USER_MP}" ; then test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; }; fi # e.g. tempdir/1.0~
-	CI=`grep @ ${MF} || true` 
+for MFI in `seq 1 $((${#MFA[@]}-1))`; do 
+	FN="${MFA[$MFI]}" ;
+	MN="${MNA[$MFI]}" ;
+	MD="${MDA[$MFI]}" ;
+	# echo "# Will check module ${MN}, modulefile ${FN}"
+	cd ${MD}
+	CI=`grep @ ${MN} || true` 
 	ERE='[a-zA-Z.]\+@lrz.de'
 	NRE='[^@]\+\s\+'
 	CL=`echo ${CI} | sed "s/\(${NRE}\)\\+\(${ERE}\)/\2 /g"`
@@ -136,7 +130,6 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	test $MERRORS = 0 || { ERRORS=$((ERRORS+MERRORS)); FMA+=(${FN}); MRA+=("${CL/% /} ${FN}"); }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
 done    ; 
-done	;
 if test ${ERRORS} != 0; then
 	echo "Checked ${#MFA[@]} modulefiles. Found ${ERRORS} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
 	for MR in "${MRA[@]}" ; do
