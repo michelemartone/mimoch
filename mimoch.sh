@@ -17,6 +17,7 @@ function module_avail()
 LMC_HELP="Usage:
 
     $0 <full-modulefile-pathname>                  # check specified modulefile
+    $0 <module-name>                               # check modulefiles for specific module
     $0 <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
 
 Will look for common mistakes in modulefiles.
@@ -39,10 +40,6 @@ shift $((OPTIND-1))
 #AM=`module_avail $1`
 #	echo boo: $AM
 #
-USER_MP="$1"
-MY_MODULEPATH=${1:-$MODULEPATH}
-test -f ${MY_MODULEPATH} && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
-PATTERN=${2:-$PATTERN}
 VERBOSE=${VERBOSE:-0}
 DIRSTOCHECK='pPdsb'
 ERRORS=0
@@ -52,11 +49,21 @@ declare -a MDA # modulefiles dir array
 declare -a MNA # modulefiles names array (indices as in MFA)
 declare -a FMA # faulty modulefiles array
 if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
-	#echo "# Will check through module $AM" # not yet active
-	echo "# Specified $1, addressing modules: $AM " # not yet active
-	echo "# Syntax of checking module files by their module names not supported yet!" # not yet active
-	exit -1
+	test $# = 1 || on_help
+	echo "# Specified $1, addressing modules: $AM "
+	for MN in $AM; do
+		MN=${MN/\(*/} # clean up of e.g. '(default)' suffix
+		FN=$(module path ${MN});
+		MD=${FN/%${MN}};
+		MFA+=(${FN});
+		MNA+=(${MN});
+		MDA+=(${MD});
+	done
 else
+	USER_MP="$1"
+	MY_MODULEPATH=${1:-$MODULEPATH}
+	test -f ${MY_MODULEPATH} && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
+	PATTERN=${2:-$PATTERN}
 	echo "# Will check through modules around ${MY_MODULEPATH}"
 	for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
 	test ${VERBOSE} -ge 1 && echo Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
@@ -76,11 +83,11 @@ else
 		# echo "# Will check module ${MN}, modulefile ${FN}"
 	done
 	done
-	for MFI in `seq 1 $((${#MFA[@]}-1))`; do 
-		FN="${MFA[$MFI]}" ;
-		MN="${MNA[$MFI]}" ;
-		MD="${MDA[$MFI]}" ;
-	done
+	#for MFI in `seq 1 $((${#MFA[@]}-1))`; do 
+	#	FN="${MFA[$MFI]}" ;
+	#	MN="${MNA[$MFI]}" ;
+	#	MD="${MDA[$MFI]}" ;
+	#done
 fi
 #set -x
 declare -a VIDP
