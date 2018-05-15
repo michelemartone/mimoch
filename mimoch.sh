@@ -103,6 +103,39 @@ if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
 if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
 if [[ "$DIRSTOCHECK" =~ b ]]; then VIDP+=('setenv .*BASE\>'); fi;
 #MY_MODULEPATH='/lrz/sys/share/modules/extfiles'
+function check_on_ptn()
+{
+	CHK="$1"
+	PTN="$2"
+	PVID="$PTN"
+		MPL=`echo "$MS" | grep "^${PVID} .*$"` && \
+		test -n "${MPL}" && \
+		MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
+		MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
+		MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
+		MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
+		test -n "$MA" || continue # matching assignment
+		test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
+		#echo $MD/${MN}
+	case $CHK in
+		DIR)
+		for PD in ${MV//:/ }; do # path directory
+			test "${VERBOSE}" -ge 3 && echo "Checking if $MI is a dir: $PD"  
+			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && MERRORS=$((MERRORS+1)); } 
+		done; 
+		;; 
+		MEX)
+		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
+			for RM in ${MI} ${MV}  ; do
+				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
+				test -z "`module_avail ${RM} 2>&1`" && \
+					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}" && MERRORS=$((MERRORS+1)); 
+			done
+			}
+		;; 
+		*) false
+	esac
+}
 for MFI in `seq 1 $((${#MFA[@]}-1))`; do 
 	FN="${MFA[$MFI]}" ;
 	MN="${MNA[$MFI]}" ;
@@ -120,29 +153,32 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 	test "${VERBOSE}" -ge 4 && module show ${PWD}/${MN}
 	MERRORS=0;
 	MS=`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep -v '^\(--\|module-whatis\|  *\)'  `
+
 	for PVID in "${VIDP[@]}" ;
 		do # path variable identifier expressions
-		#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
-		MPL=`echo "$MS" | grep "^${PVID} .*$"` && \
-		test -n "${MPL}" && \
-		MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
-		MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
-		MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
-		MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
-		test -n "$MA" || continue # matching assignment
-		test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
-		#echo $MD/${MN}
-		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
-			for RM in ${MI} ${MV}  ; do
-				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
-				test -z "`module_avail ${RM} 2>&1`" && \
-					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}" && MERRORS=$((MERRORS+1)); 
-			done
-			continue; }
-		for PD in ${MV//:/ }; do # path directory
-			test "${VERBOSE}" -ge 3 && echo "Checking if $MI is a dir: $PD"  
-			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && MERRORS=$((MERRORS+1)); } 
-		done; 
+		check_on_ptn DIR "$PVID"; continue
+		check_on_ptn MEX "$PVID"; continue
+#		#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
+#		MPL=`echo "$MS" | grep "^${PVID} .*$"` && \
+#		test -n "${MPL}" && \
+#		MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
+#		MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
+#		MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
+#		MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
+#		test -n "$MA" || continue # matching assignment
+#		test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
+#		#echo $MD/${MN}
+#		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
+#			for RM in ${MI} ${MV}  ; do
+#				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
+#				test -z "`module_avail ${RM} 2>&1`" && \
+#					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not a module!${EI}" && MERRORS=$((MERRORS+1)); 
+#			done
+#			continue; }
+#		for PD in ${MV//:/ }; do # path directory
+#			test "${VERBOSE}" -ge 3 && echo "Checking if $MI is a dir: $PD"  
+#			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && MERRORS=$((MERRORS+1)); } 
+#		done; 
 	done;
 	test $MERRORS = 0 || { ERRORS=$((ERRORS+MERRORS)); FMA+=(${FN}); MRA+=("${CL/% /} ${FN}"); }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
