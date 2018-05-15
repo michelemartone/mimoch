@@ -21,7 +21,7 @@ LMC_HELP="Usage:
     $0 [options] <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
     Where [options] are:
      -h # print help and exit
-     -v # verbose (specify multiple times to increase verbosity)
+     -v # verbose (specify up to 4 times to increase verbosity)
 
 Will look for common mistakes in modulefiles.
 It assumes output of \`module show\` to be sound in the current environment.
@@ -115,6 +115,7 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra contact info
 	test ${VERBOSE} -ge 1 && echo "Checking ${FN}"
 	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
+	test "${VERBOSE}" -ge 4 && module show ${PWD}/${MN}
 	MERRORS=0;
 	for PVID in "${VIDP[@]}" ;
 		do # path variable identifier expressions
