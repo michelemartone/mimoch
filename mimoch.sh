@@ -128,7 +128,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 done    ; 
 done	;
 if test ${ERRORS} != 0; then
-	echo "Found ${ERRORS} errors. Took ${SECONDS}s".
+	echo "Checked ${#MFA[@]} modulefiles. Found ${ERRORS} errors. Took ${SECONDS}s".
 	exit -1 # failure
 fi
 exit # success
