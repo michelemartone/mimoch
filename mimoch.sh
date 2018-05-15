@@ -22,6 +22,7 @@ LMC_HELP="Usage:
     Where [options] are:
      -h # print help and exit
      -v # verbose (specify up to 4 times to increase verbosity)
+     -X # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
 
 Will look for common mistakes in modulefiles.
 It assumes output of \`module show\` to be sound in the current environment.
@@ -29,15 +30,17 @@ Note that mistakes might be detected twice.
 False positives are also possible in certain cases.
 "
 function on_help() { echo "${LMC_HELP}";exit; }
-OPTSTRING="hv"
+OPTSTRING="hvX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
+MISCTOCHECK=''
 while getopts $OPTSTRING NAME; do
 	case $NAME in
 		#a) CHECK_WHAT='a';;
 		h) on_help;;
 		v) VERBOSE=$((VERBOSE+1));;
+		X) MISCTOCHECK="${MISCTOCHECK}t";;
 		*) false
 	esac
 done
@@ -48,8 +51,6 @@ shift $((OPTIND-1))
 #	echo boo: $AM
 #
 DIRSTOCHECK='pPdsb'
-MISCTOCHECK=''
-#MISCTOCHECK='t'
 ERRORS=0
 declare -a MRA # modulefiles responsabilities array
 declare -a MFA # modulefiles array
@@ -170,7 +171,7 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 		check_on_ptn MEX "$PVID"; continue
 	done;
 	if [[ "$MISCTOCHECK" =~ t ]] ; then
-		check_on_ptn EXT 'setenv .*USER_TEST\>'
+		check_on_ptn EXT 'setenv .*_USER_TEST\>'
 	fi
 	test $MERRORS = 0 || { ERRORS=$((ERRORS+MERRORS)); FMA+=(${FN}); MRA+=("${CL/% /} ${FN}"); }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
