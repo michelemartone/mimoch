@@ -48,6 +48,7 @@ DIRSTOCHECK='pPdsb'
 ERRORS=0
 declare -a MRA # modulefiles responsabilities array
 declare -a MFA # modulefiles array
+declare -a MDA # modulefiles dir array
 declare -a MNA # modulefiles names array (indices as in MFA)
 declare -a FMA # faulty modulefiles array
 if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
@@ -69,11 +70,13 @@ else
 		if test ! -f "${USER_MP}" ; then test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; }; fi # e.g. tempdir/1.0~
 		MFA+=(${FN});
 		MNA+=(${MN});
+		MDA+=(${MD});
 	done
 	done
 	for MFI in `seq 1 ${#MFA[@]}` ;do 
 		FN="${MFA[$MFI]}" ;
 		MN="${MNA[$MFI]}" ;
+		MD="${MDA[$MFI]}" ;
 		echo "# Will check module ${MN}, modulefile ${FN}"
 	done
 fi
@@ -109,7 +112,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 	for PVID in "${VIDP[@]}" ;
 		do # path variable identifier expressions
 		#for PVID in '.p[p]end-path .*PATH\>' 'setenv .*DIR\>' 'setenv .*_SRC\>' 'setenv .*BASE\>'; do # path variable identifier expressions
-		MPL="`module show ${PWD}/${MF} 2>&1 | sed 's/\s\s*/ /g' | grep "^${PVID} .*$" | grep -v '^\(--\|module-whatis\|  *\)'  `" && \
+		MPL="`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep "^${PVID} .*$" | grep -v '^\(--\|module-whatis\|  *\)'  `" && \
 		test -n "${MPL}" && \
 		MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
 		MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
@@ -117,7 +120,7 @@ for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
 		test -n "$MA" || continue # matching assignment
 		test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
-		#echo $MD/${MF}
+		#echo $MD/${MN}
 		test "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
 				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
