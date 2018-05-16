@@ -54,6 +54,7 @@ while getopts $OPTSTRING NAME; do
 done
 shift $((OPTIND-1))
 ERRORS=0
+MEXET_CNT=0; # module execution tests count
 declare -a VIDP
 if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
 if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
@@ -137,6 +138,7 @@ function check_on_ptn()
 			test "${VERBOSE}" -ge 3 && \
 				echo "Module $MN offers test commands variable $MI, defined as $MV"
 			#echo CMD $CMD
+			MEXET_CNT=$((MEXET_CNT+1));
 			mlamu_test "\${$MI}"
 		;; 
 		MEX)
@@ -185,7 +187,7 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 	test $MERRS_CNT = 0 || { ERRORS=$((ERRORS+MERRS_CNT)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
 done    ; 
-	echo "Checked ${#MFA[@]} modulefiles. Detected ${ERRORS} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
+	echo "Checked ${#MFA[@]} modulefiles (of which ${MEXET_CNT} offered a test command). Detected ${ERRORS} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
 if test ${ERRORS} != 0; then
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
 	if test -n "${CL}" ; then echo "Modules mention email addresses: ${CL}."; fi
