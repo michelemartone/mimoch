@@ -184,7 +184,7 @@ function check_on_ptn()
 		*) false
 	esac
 }
-for MFI in `seq 1 $((${#MFA[@]}-1))`; do 
+for MFI in `seq 0 $((${#MFA[@]}-1))`; do 
 	FN="${MFA[$MFI]}" ;
 	MN="${MNA[$MFI]}" ;
 	MD="${MDA[$MFI]}" ;
