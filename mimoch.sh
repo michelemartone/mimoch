@@ -231,11 +231,7 @@ fi
 function inc_err_cnt()
 {
 	MERRS_CNT=$((MERRS_CNT+1));
-<<<<<<< HEAD
 	if test "${VERBOSE}" -ge 3 ; then echo "# this/total mistakes detected: $MERRS_CNT/$TERRS_CNT"; fi
-=======
-	test "${VERBOSE}" -ge 3 && echo "# this/total errors detected: $MERRS_CNT/$TERRS_CNT"
->>>>>>> 5c2d67dff4d15d4e38959ff273582ebeaa86b5c6
 }
 function mlamu_test()
 {
