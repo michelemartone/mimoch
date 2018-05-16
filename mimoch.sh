@@ -49,13 +49,13 @@ function do_test()
 	MN=${TDIR}/testmodule.tcl
 	cat > ${MN} << EOF
 # missing signature here
-prepend-path /bin
+prepend-path PATH /bin
 EOF
 	MODULEPATH=$TDIR $0       | grep Checked.0.modulefiles
 	MODULEPATH=$TDIR $0 ${MN} | grep Checked.0.modulefiles
 	cat > ${MN} << EOF
 #%Module
-prepend-path /bin
+prepend-path PATH /bin
 EOF
 	MODULEPATH=$TDIR $0       ${MN} | grep Checked.1.modulefiles
 	MODULEPATH=$TDIR $0 -vvvv ${MN} | grep Checked.1.modulefiles
