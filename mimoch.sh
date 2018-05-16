@@ -186,11 +186,13 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 	test $MERRORS = 0 || { ERRORS=$((ERRORS+MERRORS)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
 done    ; 
-if test ${ERRORS} != 0; then
 	echo "Checked ${#MFA[@]} modulefiles. Detected ${ERRORS} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
+if test ${ERRORS} != 0; then
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
 	if test -n "${CL}" ; then echo "Modules mention email addresses: ${CL}."; fi
 	#for MR in "${MRA[@]}" ; do echo Contact: ${MR}; done
 	exit -1 # failure
+else
+	true;
 fi
 exit # success
