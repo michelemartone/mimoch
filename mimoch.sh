@@ -50,13 +50,14 @@ function do_test()
 	MN=testmodule.tcl
 	MP=${TDIR}/${MN}
 	cat > ${MP} << EOF
-# missing signature here
+# this module is invalid: missing signature here
 prepend-path PATH /bin
 EOF
 	MODULEPATH=$TDIR $0       | grep Checked.0.modulefiles
 	MODULEPATH=$TDIR $0 ${MP} | grep Checked.0.modulefiles
 	cat > ${MP} << EOF
 #%Module
+# this module contains 0 errors
 prepend-path PATH /bin
 setenv MY_USER_TEST true
 EOF
@@ -66,9 +67,11 @@ EOF
 	MODULEPATH=$TDIR $0 -L -X ${MN} | grep Checked.1.modulefiles..of.which.1.offered.a.test.command..
 	cat > ${MP} << EOF
 #%Module
+# this module contains 2 errors
 prepend-path PATH /ban
+setenv MY_USER_TEST false
 EOF
-	{ MODULEPATH=$TDIR $0       ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.1.errors.in.1.modulefiles.
+	{ MODULEPATH=$TDIR $0 -X    ${MN} || true; } | grep Checked.1.modulefiles..of.which.1.offered.a.test.command...Detected.2.errors.in.1.modulefiles.
 	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
 	exit
