@@ -67,11 +67,19 @@ EOF
 	MODULEPATH=$TDIR $0 -L -X ${MN} | grep Checked.1.modulefiles..of.which.1.offered.a.test.command..
 	cat > ${MP} << EOF
 #%Module
-# this module contains 2 errors
-prepend-path PATH /ban
+# this module contains 5 errors
+prepend-path PATH /not-existent-dir
+prereq non-existent-module
 setenv MY_USER_TEST false
+setenv MY_USER_DIR  /not-existent-dir
+setenv MY_USER_SRC  /not-existent-dir
+setenv MY_USER_BASE /not-existent-dir
 EOF
-	{ MODULEPATH=$TDIR $0 -X    ${MN} || true; } | grep Checked.1.modulefiles..of.which.1.offered.a.test.command...Detected.2.errors.in.1.modulefiles.
+	{ MODULEPATH=$TDIR $0 -X    ${MN} || true; } | grep Checked.1.modulefiles..of.which.1.offered.a.test.command...Detected.5.errors.in.1.modulefiles.
+	{ MODULEPATH=$TDIR $0 -d p  ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.1.errors.in.1.modulefiles.
+	{ MODULEPATH=$TDIR $0 -d '' ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.0.errors.in.0.modulefiles.
+	{ MODULEPATH=$TDIR $0    -v ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.4.errors.in.1.modulefiles.
+	{ MODULEPATH=$TDIR $0 -P -v ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.0.errors.in.0.modulefiles. # wrong
 	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
 	exit
