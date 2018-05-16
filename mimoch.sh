@@ -47,7 +47,7 @@ function result_msg()
 function sanitized_result_msg() 
 {
 	test `type -t result_msg` = function
-	result_msg $@ | sed 's/[^a-zA-Z]/./g'
+	result_msg $@ | sed 's/[^a-zA-Z0-9]/./g'
 }
 function do_test()
 {
