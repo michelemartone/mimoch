@@ -27,6 +27,7 @@ LMC_HELP="Usage:
      -v            # increase verbosity (up to 4 times)
      -L            # load / unload test
      -P            # prereq / conflict module existence check
+     -T            # self-testing
      -X            # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
 
 Will look for common mistakes in modulefiles.
@@ -35,7 +36,34 @@ Note that mistakes might be detected twice.
 False positives are also possible in certain cases.
 "
 function on_help() { echo "${LMC_HELP}";exit; }
-OPTSTRING="d:hqvLPX"
+function do_test()
+{
+	echo " ===== Running self-tests ====="
+	set -e
+	#which $0 
+	$0 -h > /dev/null 
+	test `$0 -h | wc -l` = 23 && echo " -h switch works"
+	TDIR=`mktemp -d /dev/shm/temporary-XXXX`
+	test -d ${TDIR}
+	MODULEPATH=$TDIR $0       | grep Checked.0.modulefiles
+	MN=${TDIR}/testmodule.tcl
+	cat > ${MN} << EOF
+# missing signature here
+prepend-path /bin
+EOF
+	MODULEPATH=$TDIR $0       | grep Checked.0.modulefiles
+	MODULEPATH=$TDIR $0 ${MN} | grep Checked.0.modulefiles
+	cat > ${MN} << EOF
+#%Module
+prepend-path /bin
+EOF
+	MODULEPATH=$TDIR $0       ${MN} | grep Checked.1.modulefiles
+	MODULEPATH=$TDIR $0 -vvvv ${MN} | grep Checked.1.modulefiles
+	trap "rm -fR ${TDIR}" EXIT
+	echo " ===== Self-tests successful. ====="
+	exit
+}
+OPTSTRING="d:hqvLPTX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
@@ -50,6 +78,7 @@ while getopts $OPTSTRING NAME; do
 		L) MISCTOCHECK+="L";;
 		P) MISCTOCHECK+="P";;
 		X) MISCTOCHECK+="X";;
+		T) do_test;;
 		d) DIRSTOCHECK="$OPTARG";;
 		*) false
 	esac
