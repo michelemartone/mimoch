@@ -35,6 +35,7 @@ LMC_HELP="Usage alternatives:
     $0 [options] <module-name> ...                               # check specific modules (assumes a sane MODULEPATH)
     $0 [options] [[<modulefiles-dirpath>] <filter-find-pattern>] # search and check modulefiles
 Where [options] are:
+     -a            # short for '-d ${DEF_DIRSTOCHECK} -H'
      -d SPECSTRING # check existence of specified directories. By default: ${DEF_DIRSTOCHECK}, where
                    # p: check .*PATH variables
                    # d: check .*DIR  variables
@@ -132,7 +133,7 @@ EOF
 	echo " ===== Self-tests successful. ====="
 	exit
 }
-OPTSTRING="d:hnqvCHILPSTX"
+OPTSTRING="ad:hnqvCHILPSTX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
@@ -142,6 +143,7 @@ DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
 	case $NAME in
 		#a) CHECK_WHAT='a';;
+		a) DIRSTOCHECK=${DEF_DIRSTOCHECK}; MISCTOCHECK='H';;
 		h) on_help;;
 		n) INTOPTS=n;;
 		q) VERBOSE=$((VERBOSE-1));;
