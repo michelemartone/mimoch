@@ -25,9 +25,9 @@ function module_avail()
 	true # rather than $? use test -n "`module_avail modulename`" here
 }
 DEF_DIRSTOCHECK='bdps' # see DIRSTOCHECK
-LMC_HELP="Usage:
+LMC_HELP="Usage alternatives:
 
-    $0 [options] <full-modulefile-pathname>                  # check specified modulefile
+    $0 [options] <full-modulefile-pathname> ...              # check specified modulefiles
     $0 [options] <module-name> ...                           # check specific modules (assumes a sane MODULEPATH)
     $0 [options] <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
     Where [options] are:
