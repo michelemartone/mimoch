@@ -232,8 +232,9 @@ function check_on_ptn()
 	CHK="$1"
 	PTN="$2"
 	PVID="$PTN"
-	MPL=`echo "$MS" | grep "^${PVID} .*$"` && \
-	test -n "${MPL}" && \
+	MMPL=`echo "$MS" | grep "^${PVID} .*$"` && \
+		test -n "${MMPL}" || return 0;
+	while read MPL; do
 	MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
 	# path variable identifier expressions
 	MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
@@ -289,6 +290,7 @@ function check_on_ptn()
 		;; 
 		*) false
 	esac
+	done < <( echo "$MMPL" ) # process substitution
 }
 for MFI in `seq 0 $((${#MFA[@]}-1))`; do 
 	FN="${MFA[$MFI]}" ;
