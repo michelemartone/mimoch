@@ -10,8 +10,7 @@ function module_avail()
 	module avail ${1} 2>&1 | grep -v ^---
 	true # rather than $? use test -n "`module_avail modulename`" here
 }
-#DEF_DIRSTOCHECK='bdps'
-DEF_DIRSTOCHECK='bdpPs'
+DEF_DIRSTOCHECK='bdps' # see DIRSTOCHECK
 LMC_HELP="Usage:
 
     $0 [options] <full-modulefile-pathname>                  # check specified modulefile
