@@ -19,6 +19,10 @@ test -w ${DEV_NULL}
 test `type -t module` = function
 which grep >${DEV_NULL}|| exit
 which sed  >${DEV_NULL}|| exit
+function my_which()
+{
+	which 2> ${DEV_NULL} || true
+}
 function module_avail()
 {
 	module avail ${1} 2>&1 | grep -v ^---
@@ -98,7 +102,7 @@ setenv MY_USER_TEST true
 setenv MY_CC ${NON_EXISTING_FILE}
 EOF
 	MODULEPATH=$TDIR $0       ${MP} | grep `sanitized_result_msg 1 0 0 0`
-	MODULEPATH=$TDIR $0 -C    ${MP} | grep `sanitized_result_msg 1 0 1 1`
+	{ MODULEPATH=$TDIR $0 -C    ${MP} || true;} | grep `sanitized_result_msg 1 0 1 1`
 	MODULEPATH=$TDIR $0 -vvvv ${MP} | grep `sanitized_result_msg 1 0 0 0`
 	MODULEPATH=$TDIR $0 -vvvv ${MN} | grep `sanitized_result_msg 1 0 0 0`
 	MODULEPATH=$TDIR $0 -L -X ${MN} | grep `sanitized_result_msg 1 1 0 0`
@@ -252,7 +256,7 @@ function check_on_ptn()
 		CMP)
 		true && { \
 			test "${VERBOSE}" -ge 3 && echo "Checking if $MV in PATH"  
-			test -z "`which ${MV}`" && \
+			test -z "`my_which ${MV}`" && \
 				echo "module ${MN} [${FN}] ${MC} \"${MV}\" not in PATH!${EI}" && inc_err_cnt; 
 			true
 			}
