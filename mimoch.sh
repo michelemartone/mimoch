@@ -45,20 +45,24 @@ function do_test()
 	test `$0 -h | wc -l` = 23 && echo " -h switch works"
 	TDIR=`mktemp -d /dev/shm/temporary-XXXX`
 	test -d ${TDIR}
+	NON_EXISTING_DIR=/not-existent-dir
+	EXISTING_DIR=/bin
+	test ! -d ${NON_EXISTING_DIR}
+	test   -d ${EXISTING_DIR}
 	# MODULEPATH shall have no trailing slash; use e.g. ${MODULEPATH/%\//} 
 	MODULEPATH=$TDIR $0       | grep Checked.0.modulefiles
 	MN=testmodule.tcl
 	MP=${TDIR}/${MN}
 	cat > ${MP} << EOF
 # this module is invalid: missing signature here
-prepend-path PATH /bin
+prepend-path PATH ${EXISTING_DIR}
 EOF
 	MODULEPATH=$TDIR $0       | grep Checked.0.modulefiles
 	MODULEPATH=$TDIR $0 ${MP} | grep Checked.0.modulefiles
 	cat > ${MP} << EOF
 #%Module
 # this module contains 0 errors
-prepend-path PATH /bin
+prepend-path PATH ${EXISTING_DIR}
 setenv MY_USER_TEST true
 EOF
 	MODULEPATH=$TDIR $0       ${MP} | grep Checked.1.modulefiles..of.which.0.offered.a.test.command..
@@ -68,12 +72,12 @@ EOF
 	cat > ${MP} << EOF
 #%Module
 # this module contains 5 errors
-prepend-path PATH /not-existent-dir
+prepend-path PATH ${NON_EXISTING_DIR}
 prereq non-existent-module
 setenv MY_USER_TEST false
-setenv MY_USER_DIR  /not-existent-dir
-setenv MY_USER_SRC  /not-existent-dir
-setenv MY_USER_BASE /not-existent-dir
+setenv MY_USER_DIR  ${NON_EXISTING_DIR}
+setenv MY_USER_SRC  ${NON_EXISTING_DIR}
+setenv MY_USER_BASE ${NON_EXISTING_DIR}
 EOF
 	{ MODULEPATH=$TDIR $0 -X    ${MN} || true; } | grep Checked.1.modulefiles..of.which.1.offered.a.test.command...Detected.5.errors.in.1.modulefiles.
 	{ MODULEPATH=$TDIR $0 -d p  ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.1.errors.in.1.modulefiles.
