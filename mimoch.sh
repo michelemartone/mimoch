@@ -44,6 +44,7 @@ LMC_HELP="Usage alternatives:
      -q            # decrease verbosity
      -v            # increase verbosity (up to 4 times)
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
+     -H            # check \`module help\` output
      -I            # check include flags (still UNFINISHED)
      -L            # load / unload test
      -P            # prereq / conflict module existence check
@@ -129,7 +130,7 @@ EOF
 	echo " ===== Self-tests successful. ====="
 	exit
 }
-OPTSTRING="d:hqvCILPSTX"
+OPTSTRING="d:hqvCHILPSTX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
@@ -142,6 +143,7 @@ while getopts $OPTSTRING NAME; do
 		q) VERBOSE=$((VERBOSE-1));;
 		v) VERBOSE=$((VERBOSE+1));;
 		C) MISCTOCHECK+="C";;
+		H) MISCTOCHECK+="H";;
 		I) MISCTOCHECK+="I";;
 		L) MISCTOCHECK+="L";;
 		P) MISCTOCHECK+="P";;
@@ -229,6 +231,16 @@ function mlamu_test()
 		test -n "$1"
 		CMD="( cd && module load ${MN} && eval ${1} && module unload ${MN}; )"
 		eval "${CMD}" || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt; } 
+}
+function mhelp_test()
+{
+		test -n "$MN"
+		CMD="( module help ${MN}; )"
+		test ${VERBOSE} -ge 4 && eval "${CMD}"
+		CMD="${CMD} 2>&1 | grep -q '^ERROR:'"
+		if eval "${CMD}" ; then
+			echo "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
+		fi
 }
 function check_on_ptn()
 {
@@ -334,6 +346,10 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	if [[ "$MISCTOCHECK" =~ L ]] ; then
 		test ${VERBOSE} -ge 3 && echo "Checking load/unload ${FN}"
 		mlamu_test true
+	fi
+	if [[ "$MISCTOCHECK" =~ H ]] ; then
+		test ${VERBOSE} -ge 3 && echo "Checking help ${FN}"
+		mhelp_test
 	fi
 	test $MERRS_CNT = 0 || { TERRS_CNT=$((TERRS_CNT+MERRS_CNT)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
