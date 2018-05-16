@@ -67,6 +67,7 @@ function do_test()
 	test `type -t sanitized_result_msg` = function
 	# MODULEPATH shall have no trailing slash; use e.g. ${MODULEPATH/%\//} 
 	MODULEPATH=$TDIR $0       | grep `sanitized_result_msg 0 0 0 0`
+	MODULEPATH=      $0       | grep `sanitized_result_msg 0 0 0 0`
 	MN=testmodule.tcl
 	MP=${TDIR}/${MN}
 	cat > ${MP} << EOF
@@ -156,7 +157,7 @@ if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 else
 	USER_MP="$1"
 	MY_MODULEPATH=${1:-$MODULEPATH}
-	test -f ${MY_MODULEPATH} && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
+	test -f "${MY_MODULEPATH}" -a -n "${MY_MODULEPATH}" && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
 	PATTERN=${2:-$PATTERN}
 	echo "# Will check through modules around ${MY_MODULEPATH}"
 	for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
