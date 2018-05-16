@@ -95,11 +95,13 @@ setenv MY_USER_DIR  ${NON_EXISTING_DIR}
 setenv MY_USER_SRC  ${NON_EXISTING_DIR}
 setenv MY_USER_BASE ${NON_EXISTING_DIR}
 EOF
-	{ MODULEPATH=$TDIR $0 -X    ${MN} || true; } | grep `sanitized_result_msg 1 1 5 1`
-	{ MODULEPATH=$TDIR $0 -d p  ${MN} || true; } | grep `sanitized_result_msg 1 0 1 1`
-	{ MODULEPATH=$TDIR $0 -d '' ${MN} || true; } | grep `sanitized_result_msg 1 0 0 0`
-	{ MODULEPATH=$TDIR $0    -v ${MN} || true; } | grep `sanitized_result_msg 1 0 4 1`
-	{ MODULEPATH=$TDIR $0 -P -v ${MN} || true; } | grep `sanitized_result_msg 1 0 4 1`
+	{ MODULEPATH=$TDIR $0 -X    ${MN}       || true; } | grep `sanitized_result_msg 1 1 5 1`
+	{ MODULEPATH=$TDIR $0 -d p  ${MN}       || true; } | grep `sanitized_result_msg 1 0 1 1`
+	{ MODULEPATH=$TDIR $0 -d '' ${MN}       || true; } | grep `sanitized_result_msg 1 0 0 0`
+	{ MODULEPATH=$TDIR $0 -d '' ${MN} ${MN} || true; } | grep `sanitized_result_msg 2 0 0 0`
+	{ MODULEPATH=$TDIR $0    -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 4 1`
+	{ MODULEPATH=$TDIR $0    -v ${MN} ${MN} || true; } | grep `sanitized_result_msg 2 0 8 2`
+	{ MODULEPATH=$TDIR $0 -P -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 4 1`
 	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
 	exit
