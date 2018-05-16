@@ -38,6 +38,7 @@ Will look for common mistakes in modulefiles.
 It assumes output of \`module show\` to be sound in the current environment.
 Note that mistakes might be detected twice.
 False positives are also possible in certain cases.
+Note that a badly written module can execute commands in your shell by sole load or show.
 "
 function on_help() { echo "${LMC_HELP}";exit; }
 function result_msg() 
