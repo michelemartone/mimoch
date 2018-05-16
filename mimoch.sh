@@ -220,6 +220,7 @@ fi
 function inc_err_cnt()
 {
 	MERRS_CNT=$((MERRS_CNT+1));
+	test "${VERBOSE}" -ge 3 && echo "# this/total errors detected: $MERRS_CNT/$TERRS_CNT"
 }
 function mlamu_test()
 {
