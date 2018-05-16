@@ -133,6 +133,7 @@ EOF
 	echo " ===== Self-tests successful. ====="
 	exit
 }
+echo "# ${HOSTNAME}: $0 $@"
 OPTSTRING="ad:hnqvCHILPSTX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
