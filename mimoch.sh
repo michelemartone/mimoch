@@ -3,8 +3,11 @@
 #Author: Michele Martone
 #set -x
 set -e
-which grep >/dev/null|| exit
-which sed  >/dev/null|| exit
+DEV_NULL=/dev/null
+DEV_SHM=/dev/shm
+test -w ${DEV_NULL}
+which grep >${DEV_NULL}|| exit
+which sed  >${DEV_NULL}|| exit
 function module_avail()
 {
 	module avail ${1} 2>&1 | grep -v ^---
@@ -41,9 +44,11 @@ function do_test()
 	echo " ===== Running self-tests ====="
 	set -e
 	#which $0 
-	$0 -h > /dev/null 
+	$0 -h > ${DEV_NULL} 
 	test `$0 -h | wc -l` = 23 && echo " -h switch works"
-	TDIR=`mktemp -d /dev/shm/temporary-XXXX`
+	test -d ${DEV_SHM}
+	test -w ${DEV_SHM}
+	TDIR=`mktemp -d ${DEV_SHM}/temporary-XXXX`
 	test -d ${TDIR}
 	NON_EXISTING_DIR=/not-existent-dir
 	EXISTING_DIR=/bin
@@ -144,7 +149,7 @@ else
 	for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		FN=${MD}/${MF}
 		bn=`basename ${MF}`; test ${bn:0:1} = . && continue # no hidden files
-		grep -l '#%Module' 2>&1 >/dev/null ${MF}  || continue # skip non-module files
+		grep -l '#%Module' 2>&1 >${DEV_NULL} ${MF}  || continue # skip non-module files
 		#MN=`echo ${MF} | sed 's/\s\s*/ /g' | rev | awk  -F / '{print $1"/"$2 }'| rev` # module name
 		MN=${MF}
 		MO="`module_avail ${MN}`"
