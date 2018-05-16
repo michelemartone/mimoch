@@ -45,20 +45,30 @@ function do_test()
 	test `$0 -h | wc -l` = 23 && echo " -h switch works"
 	TDIR=`mktemp -d /dev/shm/temporary-XXXX`
 	test -d ${TDIR}
+	# MODULEPATH shall have no trailing slash; use e.g. ${MODULEPATH/%\//} 
 	MODULEPATH=$TDIR $0       | grep Checked.0.modulefiles
-	MN=${TDIR}/testmodule.tcl
-	cat > ${MN} << EOF
+	MN=testmodule.tcl
+	MP=${TDIR}/${MN}
+	cat > ${MP} << EOF
 # missing signature here
 prepend-path PATH /bin
 EOF
 	MODULEPATH=$TDIR $0       | grep Checked.0.modulefiles
-	MODULEPATH=$TDIR $0 ${MN} | grep Checked.0.modulefiles
-	cat > ${MN} << EOF
+	MODULEPATH=$TDIR $0 ${MP} | grep Checked.0.modulefiles
+	cat > ${MP} << EOF
 #%Module
 prepend-path PATH /bin
+setenv MY_USER_TEST true
 EOF
-	MODULEPATH=$TDIR $0       ${MN} | grep Checked.1.modulefiles
-	MODULEPATH=$TDIR $0 -vvvv ${MN} | grep Checked.1.modulefiles
+	MODULEPATH=$TDIR $0       ${MP} | grep Checked.1.modulefiles..of.which.0.offered.a.test.command..
+	MODULEPATH=$TDIR $0 -vvvv ${MP} | grep Checked.1.modulefiles..of.which.0.offered.a.test.command..
+	MODULEPATH=$TDIR $0 -vvvv ${MN} | grep Checked.1.modulefiles..of.which.0.offered.a.test.command..
+	MODULEPATH=$TDIR $0 -L -X ${MN} | grep Checked.1.modulefiles..of.which.1.offered.a.test.command..
+	cat > ${MP} << EOF
+#%Module
+prepend-path PATH /ban
+EOF
+	{ MODULEPATH=$TDIR $0       ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.1.errors.in.1.modulefiles.
 	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
 	exit
@@ -98,8 +108,8 @@ declare -a MNA # modulefiles names array (indices as in MFA)
 declare -a FMA # faulty modulefiles array
 if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
 	test $# = 1 || on_help
-	echo "# Specified $1, addressing modules: $AM "
-	for MN in $AM; do
+	echo "# Specified $1, addressing modules: ${AM} "
+	for MN in ${AM}; do
 		MN=${MN/\(*/} # clean up of e.g. '(default)' suffix
 		FN=$(module path ${MN});
 		MD=${FN/%${MN}};
