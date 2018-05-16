@@ -17,7 +17,7 @@ function module_avail()
 DEF_DIRSTOCHECK='bdps' # see DIRSTOCHECK
 LMC_HELP="Usage:
 
-    $0 [options] <full-modulefile-pathname>                  # check specified modulefile
+    $0 [options] <full-modulefile-pathname(s)>                  # check specified modulefile(s)
     $0 [options] <module-name>                               # check modulefiles for specific module
     $0 [options] <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
     Where [options] are:
@@ -137,16 +137,18 @@ declare -a MFA # modulefiles array
 declare -a MDA # modulefiles dir array
 declare -a MNA # modulefiles names array (indices as in MFA)
 declare -a FMA # faulty modulefiles array
-if test -n "$1" && test -n "${AM:=`module_avail $1`}" ; then
-	test $# = 1 || on_help
-	echo "# Specified $1, addressing modules: ${AM} "
-	for MN in ${AM}; do
-		MN=${MN/\(*/} # clean up of e.g. '(default)' suffix
-		FN=$(module path ${MN});
-		MD=${FN/%${MN}};
-		MFA+=(${FN});
-		MNA+=(${MN});
-		MDA+=(${MD});
+if test -n "${1}" && test -n "`module_avail ${1}`" ; then
+	for ARG ; do
+		AM=`module_avail ${ARG}`
+		echo "# Specified $ARG, addressing modules: $AM"
+		for MN in ${AM}; do
+			MN=${MN/\(*/} # clean up of e.g. '(default)' suffix
+			FN=$(module path ${MN});
+			MD=${FN/%${MN}};
+			MFA+=(${FN});
+			MNA+=(${MN});
+			MDA+=(${MD});
+		done
 	done
 else
 	USER_MP="$1"
