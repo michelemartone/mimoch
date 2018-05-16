@@ -79,7 +79,7 @@ EOF
 	{ MODULEPATH=$TDIR $0 -d p  ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.1.errors.in.1.modulefiles.
 	{ MODULEPATH=$TDIR $0 -d '' ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.0.errors.in.0.modulefiles.
 	{ MODULEPATH=$TDIR $0    -v ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.4.errors.in.1.modulefiles.
-	{ MODULEPATH=$TDIR $0 -P -v ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.0.errors.in.0.modulefiles. # wrong
+	{ MODULEPATH=$TDIR $0 -P -v ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.4.errors.in.1.modulefiles.
 	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
 	exit
@@ -176,7 +176,7 @@ function check_on_ptn()
 	MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
 	MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
 	MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
-	test -n "$MA" || continue # matching assignment
+	test -n "$MA" || return 0; # matching assignment
 	test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
 	case $CHK in
 		DIR)
