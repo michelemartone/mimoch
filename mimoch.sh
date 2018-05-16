@@ -123,6 +123,7 @@ OPTSTRING="d:hqvLPTX"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 MISCTOCHECK=''
+#MISCTOCHECK+=C # unfinished
 DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
 	case $NAME in
@@ -243,6 +244,14 @@ function check_on_ptn()
 			MEXET_CNT=$((MEXET_CNT+1));
 			mlamu_test "\${$MI}"
 		;; 
+		CMP)
+		true && { \
+			test "${VERBOSE}" -ge 3 && echo "Checking if $MV in PATH"  
+			test -z "`which ${MV}`" && \
+				echo "module ${MN} [${FN}] ${MC} \"${MV}\" not in PATH!${EI}" && inc_err_cnt; 
+			true
+			}
+		;; 
 		MEX)
 		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
@@ -278,6 +287,9 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	done;
 	if [[ "$MISCTOCHECK" =~ P ]] ; then
 		check_on_ptn MEX '\(prereq\|conflict\) .*'
+	fi
+	if [[ "$MISCTOCHECK" =~ C ]] ; then
+		check_on_ptn CMP 'setenv .*\(_CC\|_FC\|_CXX\)'
 	fi
 	if [[ "$MISCTOCHECK" =~ X ]] ; then
 		check_on_ptn EXT 'setenv .*_USER_TEST\>'
