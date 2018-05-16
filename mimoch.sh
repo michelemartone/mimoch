@@ -17,8 +17,8 @@ function module_avail()
 DEF_DIRSTOCHECK='bdps' # see DIRSTOCHECK
 LMC_HELP="Usage:
 
-    $0 [options] <full-modulefile-pathname(s)>                  # check specified modulefile(s)
-    $0 [options] <module-name>                               # check modulefiles for specific module
+    $0 [options] <full-modulefile-pathname>                  # check specified modulefile
+    $0 [options] <module-name> ...                           # check specific modules (assumes a sane MODULEPATH)
     $0 [options] <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
     Where [options] are:
      -d SPECSTRING # check existence of specified directories. By default: ${DEF_DIRSTOCHECK}, where
@@ -139,7 +139,8 @@ declare -a MFA # modulefiles array
 declare -a MDA # modulefiles dir array
 declare -a MNA # modulefiles names array (indices as in MFA)
 declare -a FMA # faulty modulefiles array
-if test -n "${1}" && test -n "`module_avail ${1}`" ; then
+test -z "${MODULEPATH}" && { echo "# Your MODULEPATH variable is empty. Expect trouble!"; }
+if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 	for ARG ; do
 		AM=`module_avail ${ARG}`
 		echo "# Specified $ARG, addressing modules: $AM"
@@ -159,7 +160,7 @@ else
 	PATTERN=${2:-$PATTERN}
 	echo "# Will check through modules around ${MY_MODULEPATH}"
 	for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
-	test ${VERBOSE} -ge 1 && echo Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}
+	test ${VERBOSE} -ge 1 && echo "# Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}"
 	cd ${MD}
 	for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		FN=${MD}/${MF}
