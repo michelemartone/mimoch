@@ -73,7 +73,9 @@ function do_test()
 	TDIR=`mktemp -d ${DEV_SHM}/temporary-XXXX`
 	test -d ${TDIR}
 	NON_EXISTING_DIR=/not-existent-dir
+	NON_EXISTING_FILE=gcc_
 	EXISTING_DIR=/bin
+	test ! -f ${NON_EXISTING_FILE}
 	test ! -d ${NON_EXISTING_DIR}
 	test   -d ${EXISTING_DIR}
 	test `type -t sanitized_result_msg` = function
@@ -93,8 +95,10 @@ EOF
 # this module contains 0 errors
 prepend-path PATH ${EXISTING_DIR}
 setenv MY_USER_TEST true
+setenv MY_CC ${NON_EXISTING_FILE}
 EOF
 	MODULEPATH=$TDIR $0       ${MP} | grep `sanitized_result_msg 1 0 0 0`
+	MODULEPATH=$TDIR $0 -C    ${MP} | grep `sanitized_result_msg 1 0 1 1`
 	MODULEPATH=$TDIR $0 -vvvv ${MP} | grep `sanitized_result_msg 1 0 0 0`
 	MODULEPATH=$TDIR $0 -vvvv ${MN} | grep `sanitized_result_msg 1 0 0 0`
 	MODULEPATH=$TDIR $0 -L -X ${MN} | grep `sanitized_result_msg 1 1 0 0`
