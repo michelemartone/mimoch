@@ -160,6 +160,7 @@ if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
 if [[ "$DIRSTOCHECK" =~ d ]]; then VIDP+=('setenv .*DIR\>'); fi;
 if [[ "$DIRSTOCHECK" =~ s ]]; then VIDP+=('setenv .*_SRC\>'); fi;
 if [[ "$DIRSTOCHECK" =~ b ]]; then VIDP+=('setenv .*BASE\>'); fi;
+test -z "$MISCTOCHECK$DIRSTOCHECK" && { echo "# No test specified. Are you sure this is what you intended ?"; }
 declare -a MRA # modulefiles responsabilities array
 declare -a MFA # modulefiles array
 declare -a MDA # modulefiles dir array
