@@ -44,8 +44,10 @@ LMC_HELP="Usage alternatives:
      -q            # decrease verbosity
      -v            # increase verbosity (up to 4 times)
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
+     -I            # check include flags (still UNFINISHED)
      -L            # load / unload test
      -P            # prereq / conflict module existence check
+     -S            # check link flags (still UNFINISHED)
      -T            # self-testing
      -X            # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
 
@@ -127,12 +129,11 @@ EOF
 	echo " ===== Self-tests successful. ====="
 	exit
 }
-OPTSTRING="d:hqvCLPTX"
+OPTSTRING="d:hqvCILPSTX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 MISCTOCHECK=''
-#MISCTOCHECK+=SI
 DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
 	case $NAME in
@@ -141,10 +142,10 @@ while getopts $OPTSTRING NAME; do
 		q) VERBOSE=$((VERBOSE-1));;
 		v) VERBOSE=$((VERBOSE+1));;
 		C) MISCTOCHECK+="C";;
-		#I) MISCTOCHECK+="I";; # TODO: undocumented
+		I) MISCTOCHECK+="I";;
 		L) MISCTOCHECK+="L";;
 		P) MISCTOCHECK+="P";;
-		#S) MISCTOCHECK+="S";; # TODO: undocumented
+		S) MISCTOCHECK+="S";;
 		X) MISCTOCHECK+="X";;
 		T) do_test;;
 		d) DIRSTOCHECK="$OPTARG";;
