@@ -31,10 +31,10 @@ function module_avail()
 DEF_DIRSTOCHECK='bdps' # see DIRSTOCHECK
 LMC_HELP="Usage alternatives:
 
-    $0 [options] <full-modulefile-pathname> ...              # check specified modulefiles
-    $0 [options] <module-name> ...                           # check specific modules (assumes a sane MODULEPATH)
-    $0 [options] <modulefiles-dirpath> <filter-find-pattern> # search and check modulefiles
-    Where [options] are:
+    $0 [options] <full-modulefile-pathname> ...                  # check specified modulefiles
+    $0 [options] <module-name> ...                               # check specific modules (assumes a sane MODULEPATH)
+    $0 [options] [[<modulefiles-dirpath>] <filter-find-pattern>] # search and check modulefiles
+Where [options] are:
      -d SPECSTRING # check existence of specified directories. By default: ${DEF_DIRSTOCHECK}, where
                    # p: check .*PATH variables
                    # d: check .*DIR  variables
@@ -46,10 +46,10 @@ LMC_HELP="Usage alternatives:
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
      -H            # check \`module help\` output
      -I            # check include flags (still UNFINISHED)
-     -L            # load / unload test
+     -L            # check \`module load\` / \`module unload\`
      -P            # prereq / conflict module existence check
      -S            # check link flags (still UNFINISHED)
-     -T            # self-testing
+     -T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
      -X            # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
 
 Will look for common mistakes in modulefiles.
