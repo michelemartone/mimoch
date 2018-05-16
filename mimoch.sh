@@ -6,6 +6,7 @@ set -e
 DEV_NULL=/dev/null
 DEV_SHM=/dev/shm
 test -w ${DEV_NULL}
+test `type -t module` = function
 which grep >${DEV_NULL}|| exit
 which sed  >${DEV_NULL}|| exit
 function module_avail()
@@ -45,6 +46,7 @@ function result_msg()
 }
 function sanitized_result_msg() 
 {
+	test `type -t result_msg` = function
 	result_msg $@ | sed 's/[^a-zA-Z]/./g'
 }
 function do_test()
@@ -62,6 +64,7 @@ function do_test()
 	EXISTING_DIR=/bin
 	test ! -d ${NON_EXISTING_DIR}
 	test   -d ${EXISTING_DIR}
+	test `type -t sanitized_result_msg` = function
 	# MODULEPATH shall have no trailing slash; use e.g. ${MODULEPATH/%\//} 
 	MODULEPATH=$TDIR $0       | grep `sanitized_result_msg 0 0 0 0`
 	MN=testmodule.tcl
