@@ -103,7 +103,7 @@ fi
 #set -x
 function inc_err_cnt()
 {
-	MERRORS=$((MERRORS+1));
+	MERRS_CNT=$((MERRS_CNT+1));
 }
 function mlamu_test()
 {
@@ -166,7 +166,7 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 	test ${VERBOSE} -ge 1 && echo "Checking ${FN}"
 	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
 	test "${VERBOSE}" -ge 4 && module show ${PWD}/${MN}
-	MERRORS=0;
+	MERRS_CNT=0; # module errors count
 	MS=`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep -v '^\(--\|module-whatis\|  *\)'  `
 	for PVID in "${VIDP[@]}" ;
 		do
@@ -182,7 +182,7 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 		test ${VERBOSE} -ge 3 && echo "Checking load/unload ${FN}"
 		mlamu_test true
 	fi
-	test $MERRORS = 0 || { ERRORS=$((ERRORS+MERRORS)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
+	test $MERRS_CNT = 0 || { ERRORS=$((ERRORS+MERRS_CNT)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
 done    ; 
 	echo "Checked ${#MFA[@]} modulefiles. Detected ${ERRORS} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
