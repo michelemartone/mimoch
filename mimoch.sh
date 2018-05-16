@@ -132,6 +132,7 @@ OPTSTRING="d:hqvCLPTX"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 MISCTOCHECK=''
+#MISCTOCHECK+=SI
 DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
 	case $NAME in
@@ -143,6 +144,7 @@ while getopts $OPTSTRING NAME; do
 		#I) MISCTOCHECK+="I";; # TODO: undocumented
 		L) MISCTOCHECK+="L";;
 		P) MISCTOCHECK+="P";;
+		#S) MISCTOCHECK+="S";; # TODO: undocumented
 		X) MISCTOCHECK+="X";;
 		T) do_test;;
 		d) DIRSTOCHECK="$OPTARG";;
@@ -265,6 +267,14 @@ function check_on_ptn()
 		INC)
 		true && { \
 			test "${VERBOSE}" -ge 3 && echo "NEED CHECK if $MV is OK"  
+			# TODO: write me
+			true
+			}
+		;; 
+		SHL)
+		true && { \
+			test "${VERBOSE}" -ge 3 && echo "NEED CHECK if $MV is OK"  
+			# TODO: write me
 			true
 			}
 		;; 
@@ -309,6 +319,9 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	fi
 	if [[ "$MISCTOCHECK" =~ I ]] ; then
 		check_on_ptn INC 'setenv .*\(_INC\)\>'
+	fi
+	if [[ "$MISCTOCHECK" =~ S ]] ; then
+		check_on_ptn SHL 'setenv .*\(_SHLIB\|_LIB\)\>'
 	fi
 	if [[ "$MISCTOCHECK" =~ X ]] ; then
 		check_on_ptn EXT 'setenv .*_USER_TEST\>'
