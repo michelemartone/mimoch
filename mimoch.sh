@@ -165,6 +165,19 @@ if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 			MDA+=(${MD});
 		done
 	done
+elif test -f "${1}" -a ! -d "${1}" ; then
+	for ARG ; do
+		grep -l '#%Module' 2>&1 >${DEV_NULL} ${ARG}  || continue # skip non-module files
+		echo "# Specified module $ARG"
+		for MN in `basename ${ARG}`; do
+			MN=${MN/\(*/} # clean up of e.g. '(default)' suffix
+			FN=${ARG}
+			MD=${FN/%${MN}};
+			MFA+=(${FN});
+			MNA+=(${MN});
+			MDA+=(${MD});
+		done
+	done
 else
 	USER_MP="$1"
 	MY_MODULEPATH=${1:-$MODULEPATH}
