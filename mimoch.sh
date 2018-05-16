@@ -53,7 +53,7 @@ while getopts $OPTSTRING NAME; do
 	esac
 done
 shift $((OPTIND-1))
-ERRORS=0
+TERRS_CNT=0; # total module errors count
 MEXET_CNT=0; # module execution tests count
 declare -a VIDP
 if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
@@ -184,11 +184,11 @@ for MFI in `seq 1 $((${#MFA[@]}-1))`; do
 		test ${VERBOSE} -ge 3 && echo "Checking load/unload ${FN}"
 		mlamu_test true
 	fi
-	test $MERRS_CNT = 0 || { ERRORS=$((ERRORS+MERRS_CNT)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
+	test $MERRS_CNT = 0 || { TERRS_CNT=$((TERRS_CNT+MERRS_CNT)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
 done    ; 
-	echo "Checked ${#MFA[@]} modulefiles (of which ${MEXET_CNT} offered a test command). Detected ${ERRORS} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
-if test ${ERRORS} != 0; then
+	echo "Checked ${#MFA[@]} modulefiles (of which ${MEXET_CNT} offered a test command). Detected ${TERRS_CNT} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
+if test ${TERRS_CNT} != 0; then
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
 	if test -n "${CL}" ; then echo "Modules mention email addresses: ${CL}."; fi
 	#for MR in "${MRA[@]}" ; do echo Contact: ${MR}; done
