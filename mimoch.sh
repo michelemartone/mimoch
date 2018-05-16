@@ -23,7 +23,8 @@ LMC_HELP="Usage:
                    # s: check .*_SRC variables
                    # b: check .*BASE variables
      -h            # print help and exit
-     -v            # verbose (specify up to 4 times to increase verbosity)
+     -q            # decrease verbosity
+     -v            # increase verbosity (up to 4 times)
      -L            # load / unload test
      -P            # prereq / conflict module existence check
      -X            # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
@@ -34,7 +35,7 @@ Note that mistakes might be detected twice.
 False positives are also possible in certain cases.
 "
 function on_help() { echo "${LMC_HELP}";exit; }
-OPTSTRING="d:hvLPX"
+OPTSTRING="d:hqvLPX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
@@ -44,6 +45,7 @@ while getopts $OPTSTRING NAME; do
 	case $NAME in
 		#a) CHECK_WHAT='a';;
 		h) on_help;;
+		q) VERBOSE=$((VERBOSE-1));;
 		v) VERBOSE=$((VERBOSE+1));;
 		L) MISCTOCHECK+="L";;
 		P) MISCTOCHECK+="P";;
