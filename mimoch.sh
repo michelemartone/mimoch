@@ -39,6 +39,7 @@ LMC_HELP="Usage alternatives:
      -h            # print help and exit
      -q            # decrease verbosity
      -v            # increase verbosity (up to 4 times)
+     -C            # check for presence of eventually declared _CC|_FC|_CXX variables
      -L            # load / unload test
      -P            # prereq / conflict module existence check
      -T            # self-testing
@@ -118,12 +119,11 @@ EOF
 	echo " ===== Self-tests successful. ====="
 	exit
 }
-OPTSTRING="d:hqvLPTX"
+OPTSTRING="d:hqvCLPTX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 MISCTOCHECK=''
-#MISCTOCHECK+=C # unfinished
 DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
 	case $NAME in
@@ -131,6 +131,7 @@ while getopts $OPTSTRING NAME; do
 		h) on_help;;
 		q) VERBOSE=$((VERBOSE-1));;
 		v) VERBOSE=$((VERBOSE+1));;
+		C) MISCTOCHECK+="C";;
 		L) MISCTOCHECK+="L";;
 		P) MISCTOCHECK+="P";;
 		X) MISCTOCHECK+="X";;
