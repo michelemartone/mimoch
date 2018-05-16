@@ -140,6 +140,7 @@ while getopts $OPTSTRING NAME; do
 		q) VERBOSE=$((VERBOSE-1));;
 		v) VERBOSE=$((VERBOSE+1));;
 		C) MISCTOCHECK+="C";;
+		#I) MISCTOCHECK+="I";; # TODO: undocumented
 		L) MISCTOCHECK+="L";;
 		P) MISCTOCHECK+="P";;
 		X) MISCTOCHECK+="X";;
@@ -261,6 +262,12 @@ function check_on_ptn()
 			true
 			}
 		;; 
+		INC)
+		true && { \
+			test "${VERBOSE}" -ge 3 && echo "NEED CHECK if $MV is OK"  
+			true
+			}
+		;; 
 		MEX)
 		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
@@ -299,6 +306,9 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	fi
 	if [[ "$MISCTOCHECK" =~ C ]] ; then
 		check_on_ptn CMP 'setenv .*\(_CC\|_FC\|_CXX\)'
+	fi
+	if [[ "$MISCTOCHECK" =~ I ]] ; then
+		check_on_ptn INC 'setenv .*\(_INC\)\>'
 	fi
 	if [[ "$MISCTOCHECK" =~ X ]] ; then
 		check_on_ptn EXT 'setenv .*_USER_TEST\>'
