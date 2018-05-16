@@ -53,7 +53,7 @@ Where [options] are:
      -T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
      -X            # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
 
-Will look for common mistakes in modulefiles.
+Will look for common mistakes in shell modulefiles.
 If any mistake if found, will exit with non-zero status.
 It assumes output of \`module show\` to be sound in the current environment.
 Note that mistakes might be detected twice.
@@ -63,7 +63,7 @@ Note that a badly written module can execute commands in your shell by sole load
 function on_help() { echo "${LMC_HELP}";exit; }
 function result_msg() 
 {
-	echo -n "Checked ${1} modulefiles (of which ${2} offered a test command). Detected ${3} errors in ${4} modulefiles."
+	echo -n "Checked ${1} modulefiles (of which ${2} offered a test command). Detected ${3} mistakes in ${4} modulefiles."
 }
 function sanitized_result_msg() 
 {
@@ -101,7 +101,7 @@ EOF
 	MODULEPATH=$TDIR $0 ${MP} | grep `sanitized_result_msg 0 0 0 0`
 	cat > ${MP} << EOF
 #%Module
-# this module contains 0 errors
+# this module contains 0 mistakes
 prepend-path PATH ${EXISTING_DIR}
 setenv MY_USER_TEST true
 setenv MY_CC ${NON_EXISTING_FILE}
@@ -113,7 +113,7 @@ EOF
 	MODULEPATH=$TDIR $0 -L -X ${MN} | grep `sanitized_result_msg 1 1 0 0`
 	cat > ${MP} << EOF
 #%Module
-# this module contains 5 errors
+# this module contains 5 mistakes
 prepend-path PATH ${NON_EXISTING_DIR}
 prereq non-existent-module
 setenv MY_USER_TEST false
@@ -159,7 +159,7 @@ while getopts $OPTSTRING NAME; do
 	esac
 done
 shift $((OPTIND-1))
-TERRS_CNT=0; # total module errors count
+TERRS_CNT=0; # total module mistakes count
 MEXET_CNT=0; # module execution tests count
 declare -a VIDP
 if [[ "$DIRSTOCHECK" =~ p ]]; then VIDP+=('\(pre\|ap\)pend-path .*PATH\>'); fi;
@@ -228,7 +228,7 @@ fi
 function inc_err_cnt()
 {
 	MERRS_CNT=$((MERRS_CNT+1));
-	if test "${VERBOSE}" -ge 3 ; then echo "# this/total errors detected: $MERRS_CNT/$TERRS_CNT"; fi
+	if test "${VERBOSE}" -ge 3 ; then echo "# this/total mistakes detected: $MERRS_CNT/$TERRS_CNT"; fi
 }
 function mlamu_test()
 {
@@ -326,7 +326,7 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	test ${VERBOSE} -ge 1 && echo "Checking ${FN}"
 	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
 	test "${VERBOSE}" -ge 4 && module show ${PWD}/${MN}
-	MERRS_CNT=0; # module errors count
+	MERRS_CNT=0; # module mistakes count
 	MS=`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep -v '^\(--\|module-whatis\|  *\)'  `
 	for PVID in "${VIDP[@]}" ;
 		do
