@@ -43,6 +43,7 @@ Where [options] are:
      -h            # print help and exit
      -q            # decrease verbosity
      -v            # increase verbosity (up to 4 times)
+     -n            # exit with zero status (as long as no internal errors encountered)
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
      -H            # check \`module help\` output
      -I            # check include flags (still UNFINISHED)
@@ -53,6 +54,7 @@ Where [options] are:
      -X            # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
 
 Will look for common mistakes in modulefiles.
+If any mistake if found, will exit with non-zero status.
 It assumes output of \`module show\` to be sound in the current environment.
 Note that mistakes might be detected twice.
 False positives are also possible in certain cases.
@@ -130,16 +132,18 @@ EOF
 	echo " ===== Self-tests successful. ====="
 	exit
 }
-OPTSTRING="d:hqvCHILPSTX"
+OPTSTRING="d:hnqvCHILPSTX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 MISCTOCHECK=''
+INTOPTS='';
 DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
 	case $NAME in
 		#a) CHECK_WHAT='a';;
 		h) on_help;;
+		n) INTOPTS=n;;
 		q) VERBOSE=$((VERBOSE-1));;
 		v) VERBOSE=$((VERBOSE+1));;
 		C) MISCTOCHECK+="C";;
@@ -360,7 +364,7 @@ if test ${TERRS_CNT} != 0; then
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
 	if test -n "${CL}" ; then echo "Modules mention email addresses: ${CL}."; fi
 	#for MR in "${MRA[@]}" ; do echo Contact: ${MR}; done
-	exit -1 # failure
+	if [[ "$INTOPTS" =~ n ]]; then exit 0; else exit -1; fi
 else
 	true;
 fi
