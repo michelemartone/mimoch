@@ -43,6 +43,10 @@ function result_msg()
 {
 	echo -n "Checked ${1} modulefiles (of which ${2} offered a test command). Detected ${3} errors in ${4} modulefiles."
 }
+function sanitized_result_msg() 
+{
+	result_msg $@ | sed 's/[^a-zA-Z]/./g'
+}
 function do_test()
 {
 	echo " ===== Running self-tests ====="
@@ -59,25 +63,25 @@ function do_test()
 	test ! -d ${NON_EXISTING_DIR}
 	test   -d ${EXISTING_DIR}
 	# MODULEPATH shall have no trailing slash; use e.g. ${MODULEPATH/%\//} 
-	MODULEPATH=$TDIR $0       | grep Checked.0.modulefiles
+	MODULEPATH=$TDIR $0       | grep `sanitized_result_msg 0 0 0 0`
 	MN=testmodule.tcl
 	MP=${TDIR}/${MN}
 	cat > ${MP} << EOF
 # this module is invalid: missing signature here
 prepend-path PATH ${EXISTING_DIR}
 EOF
-	MODULEPATH=$TDIR $0       | grep Checked.0.modulefiles
-	MODULEPATH=$TDIR $0 ${MP} | grep Checked.0.modulefiles
+	MODULEPATH=$TDIR $0       | grep `sanitized_result_msg 0 0 0 0`
+	MODULEPATH=$TDIR $0 ${MP} | grep `sanitized_result_msg 0 0 0 0`
 	cat > ${MP} << EOF
 #%Module
 # this module contains 0 errors
 prepend-path PATH ${EXISTING_DIR}
 setenv MY_USER_TEST true
 EOF
-	MODULEPATH=$TDIR $0       ${MP} | grep Checked.1.modulefiles..of.which.0.offered.a.test.command..
-	MODULEPATH=$TDIR $0 -vvvv ${MP} | grep Checked.1.modulefiles..of.which.0.offered.a.test.command..
-	MODULEPATH=$TDIR $0 -vvvv ${MN} | grep Checked.1.modulefiles..of.which.0.offered.a.test.command..
-	MODULEPATH=$TDIR $0 -L -X ${MN} | grep Checked.1.modulefiles..of.which.1.offered.a.test.command..
+	MODULEPATH=$TDIR $0       ${MP} | grep `sanitized_result_msg 1 0 0 0`
+	MODULEPATH=$TDIR $0 -vvvv ${MP} | grep `sanitized_result_msg 1 0 0 0`
+	MODULEPATH=$TDIR $0 -vvvv ${MN} | grep `sanitized_result_msg 1 0 0 0`
+	MODULEPATH=$TDIR $0 -L -X ${MN} | grep `sanitized_result_msg 1 1 0 0`
 	cat > ${MP} << EOF
 #%Module
 # this module contains 5 errors
@@ -88,11 +92,11 @@ setenv MY_USER_DIR  ${NON_EXISTING_DIR}
 setenv MY_USER_SRC  ${NON_EXISTING_DIR}
 setenv MY_USER_BASE ${NON_EXISTING_DIR}
 EOF
-	{ MODULEPATH=$TDIR $0 -X    ${MN} || true; } | grep Checked.1.modulefiles..of.which.1.offered.a.test.command...Detected.5.errors.in.1.modulefiles.
-	{ MODULEPATH=$TDIR $0 -d p  ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.1.errors.in.1.modulefiles.
-	{ MODULEPATH=$TDIR $0 -d '' ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.0.errors.in.0.modulefiles.
-	{ MODULEPATH=$TDIR $0    -v ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.4.errors.in.1.modulefiles.
-	{ MODULEPATH=$TDIR $0 -P -v ${MN} || true; } | grep Checked.1.modulefiles..of.which.0.offered.a.test.command...Detected.4.errors.in.1.modulefiles.
+	{ MODULEPATH=$TDIR $0 -X    ${MN} || true; } | grep `sanitized_result_msg 1 1 5 1`
+	{ MODULEPATH=$TDIR $0 -d p  ${MN} || true; } | grep `sanitized_result_msg 1 0 1 1`
+	{ MODULEPATH=$TDIR $0 -d '' ${MN} || true; } | grep `sanitized_result_msg 1 0 0 0`
+	{ MODULEPATH=$TDIR $0    -v ${MN} || true; } | grep `sanitized_result_msg 1 0 4 1`
+	{ MODULEPATH=$TDIR $0 -P -v ${MN} || true; } | grep `sanitized_result_msg 1 0 4 1`
 	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
 	exit
