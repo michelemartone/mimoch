@@ -39,6 +39,10 @@ Note that mistakes might be detected twice.
 False positives are also possible in certain cases.
 "
 function on_help() { echo "${LMC_HELP}";exit; }
+function result_msg() 
+{
+	echo -n "Checked ${1} modulefiles (of which ${2} offered a test command). Detected ${3} errors in ${4} modulefiles."
+}
 function do_test()
 {
 	echo " ===== Running self-tests ====="
@@ -248,7 +252,8 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	test $MERRS_CNT = 0 || { TERRS_CNT=$((TERRS_CNT+MERRS_CNT)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
 	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
 done    ; 
-	echo "Checked ${#MFA[@]} modulefiles (of which ${MEXET_CNT} offered a test command). Detected ${TERRS_CNT} errors in ${#FMA[@]} modulefiles. Took ${SECONDS}s".
+	result_msg ${#MFA[@]} ${MEXET_CNT} ${TERRS_CNT} ${#FMA[@]}
+	echo " Took ${SECONDS}s".
 if test ${TERRS_CNT} != 0; then
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
 	if test -n "${CL}" ; then echo "Modules mention email addresses: ${CL}."; fi
