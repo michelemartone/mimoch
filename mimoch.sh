@@ -146,6 +146,7 @@ function echoX()
 	fi
 }
 function echo0() { echoX ${FUNCNAME: -1} $@; }
+function echo3() { echoX ${FUNCNAME: -1} $@; }
 MISCTOCHECK=''
 INTOPTS='';
 DIRSTOCHECK=${DEF_DIRSTOCHECK}
@@ -239,7 +240,7 @@ fi
 function inc_err_cnt()
 {
 	MERRS_CNT=$((MERRS_CNT+1));
-	if test "${VERBOSE}" -ge 3 ; then echo "# this/total mistakes detected: $MERRS_CNT/$TERRS_CNT"; fi
+	echo3 "# this/total mistakes detected: $MERRS_CNT/$TERRS_CNT";
 }
 function mlamu_test()
 {
@@ -275,21 +276,20 @@ function check_on_ptn()
 	case $CHK in
 		DIR)
 		for PD in ${MV//:/ }; do # path directory
-			test "${VERBOSE}" -ge 3 && echo "Checking if $MI is a dir: $PD"  
+			echo3 "Checking if $MI is a dir: $PD";
 			test -d ${PD} || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt; } 
 		done; 
 		;; 
 		EXT)
 			MV="`echo ${MPL} | cut -d \  -f 3- `" # this tolerates spaces
-			test "${VERBOSE}" -ge 3 && \
-				echo "Module $MN offers test commands variable $MI, defined as $MV"
+			echo3 "Module $MN offers test commands variable $MI, defined as $MV"
 			#echo CMD $CMD
 			MEXET_CNT=$((MEXET_CNT+1));
 			mlamu_test "\${$MI}"
 		;; 
 		CMP)
 		true && { \
-			test "${VERBOSE}" -ge 3 && echo "Checking if $MV in PATH"  
+			echo3 "Checking if $MV in PATH"  
 			test -z "`my_which ${MV}`" && \
 				echo0 "module ${MN} [${FN}] ${MC} \"${MV}\" not in PATH!${EI}" && inc_err_cnt; 
 			true
@@ -297,14 +297,14 @@ function check_on_ptn()
 		;; 
 		INC)
 		true && { \
-			test "${VERBOSE}" -ge 3 && echo0 "NEED CHECK if $MV is OK"  
+			echo3 "NEED CHECK if $MV is OK"  
 			# TODO: write me
 			true
 			}
 		;; 
 		SHL)
 		true && { \
-			test "${VERBOSE}" -ge 3 && echo0 "NEED CHECK if $MV is OK"  
+			echo3 "NEED CHECK if $MV is OK"  
 			# TODO: write me
 			true
 			}
@@ -312,7 +312,7 @@ function check_on_ptn()
 		MEX)
 		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
-				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
+				echo3 "Checking if a module: $RM"  
 				test -z "`module_avail ${RM} 2>&1`" && \
 					echo0 "module ${MN} [${FN}] ${MC} \"${RM}\" not an available module!${EI}" && inc_err_cnt; 
 			done
@@ -359,11 +359,11 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 		check_on_ptn EXT 'setenv .*_USER_TEST\>'
 	fi
 	if [[ "$MISCTOCHECK" =~ L ]] ; then
-		test ${VERBOSE} -ge 3 && echo "Checking load/unload ${FN}"
+		echo3 "Checking load/unload ${FN}";
 		mlamu_test true
 	fi
 	if [[ "$MISCTOCHECK" =~ H ]] ; then
-		test ${VERBOSE} -ge 3 && echo "Checking help ${FN}"
+		echo3 "Checking help ${FN}";
 		mhelp_test
 	fi
 	test $MERRS_CNT = 0 || { TERRS_CNT=$((TERRS_CNT+MERRS_CNT)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
