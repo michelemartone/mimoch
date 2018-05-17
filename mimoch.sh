@@ -48,10 +48,10 @@ Where [options] are:
      -n            # exit with zero status (as long as no internal errors encountered)
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
      -H            # check \`module help\` output
-     -I            # check include flags (still UNFINISHED)
+     -I            # check include flags (unfinished: policy missing)
      -L            # check \`module load\` / \`module unload\`
      -P            # prereq / conflict module existence check
-     -S            # check link flags (still UNFINISHED)
+     -S            # check link flags (unfinished: policy missing)
      -T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
      -X            # if a *_USER_TEST variable is provided by a module, execute it in the shell using \`eval\` (implies module load/unload)
 
@@ -301,14 +301,18 @@ function check_on_ptn()
 		INC)
 		true && { \
 			echo3 "NEED CHECK if $MV is OK"  
-			# TODO: write me
+			# TODO: Need a policy here. E.g.
+			#  Shall one check this after prereq loading ?
+			#  Shall one use specific compilers ?
 			true
 			}
 		;; 
 		SHL)
 		true && { \
 			echo3 "NEED CHECK if $MV is OK"  
-			# TODO: write me
+			# TODO: Need a policy here. E.g.
+			#  Shall one check this after prereq loading ?
+			#  Shall one use specific compilers ?
 			true
 			}
 		;; 
@@ -338,7 +342,8 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	EI=''
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra contact info
 	echo1 "Checking ${FN}";
-	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
+	# TODO: policy missing here. E.g.:
+	#  To decide whether 'setenv .*_DOC\>' shall be dir or file.
 	test "${VERBOSE}" -ge 4 && module show ${PWD}/${MN}
 	MERRS_CNT=0; # module mistakes count
 	MS=`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep -v '^\(--\|module-whatis\|  *\)'  `
