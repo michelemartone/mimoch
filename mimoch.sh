@@ -356,7 +356,7 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 		check_on_ptn INC 'setenv .*\(_INC\)\>'
 	fi
 	if [[ "$MISCTOCHECK" =~ S ]] ; then
-		check_on_ptn SHL 'setenv .*\(_SHLIB\|_LIB\)\>'
+		check_on_ptn SHL 'setenv .*\(_SHLIB\|_LIB\|LDFLAGS\|LIBS\)\>'
 	fi
 	if [[ "$MISCTOCHECK" =~ X ]] ; then
 		check_on_ptn EXT 'setenv .*_USER_TEST\>'
