@@ -52,7 +52,7 @@ Where [options] are:
      -P            # prereq / conflict module existence check
      -S            # check link flags (still UNFINISHED)
      -T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
-     -X            # if a *_USER_TEST variable is provided by a module, evaluate it (will load/unload the module)
+     -X            # if a *_USER_TEST variable is provided by a module, execute it in the shell using \`eval\` (implies module load/unload)
 
 Will look for common mistakes in shell modulefiles.
 If any mistake if found, will exit with non-zero status.
