@@ -18,6 +18,7 @@ DEV_SHM=/dev/shm
 test -w ${DEV_NULL}
 test `type -t module` = function
 which grep >${DEV_NULL}|| exit
+which date >${DEV_NULL}|| exit
 which sed  >${DEV_NULL}|| exit
 function my_which()
 {
@@ -133,7 +134,7 @@ EOF
 	echo " ===== Self-tests successful. ====="
 	exit
 }
-echo "# ${HOSTNAME}: $0 $@"
+echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
 OPTSTRING="ad:hnqvCHILPSTX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
@@ -218,7 +219,7 @@ else
 	MY_MODULEPATH=${1:-$MODULEPATH}
 	test -f "${MY_MODULEPATH}" -a -n "${MY_MODULEPATH}" && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
 	PATTERN=${2:-$PATTERN}
-	echo "# Will check through modules around ${MY_MODULEPATH}"
+	echo "# Will scan for modules through ${MY_MODULEPATH}"
 	for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
 	echo1 "# Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}"
 	cd ${MD}
