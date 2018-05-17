@@ -249,6 +249,12 @@ function mhelp_test()
 			echo "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
 		fi
 }
+function echo0()
+{
+	if test ${VERBOSE} -ge ${FUNCNAME: -1}; then
+		echo $@
+	fi
+}
 function check_on_ptn()
 {
 	CHK="$1"
@@ -268,7 +274,7 @@ function check_on_ptn()
 		DIR)
 		for PD in ${MV//:/ }; do # path directory
 			test "${VERBOSE}" -ge 3 && echo "Checking if $MI is a dir: $PD"  
-			test -d ${PD} || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt; } 
+			test -d ${PD} || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt; } 
 		done; 
 		;; 
 		EXT)
@@ -283,20 +289,20 @@ function check_on_ptn()
 		true && { \
 			test "${VERBOSE}" -ge 3 && echo "Checking if $MV in PATH"  
 			test -z "`my_which ${MV}`" && \
-				echo "module ${MN} [${FN}] ${MC} \"${MV}\" not in PATH!${EI}" && inc_err_cnt; 
+				echo0 "module ${MN} [${FN}] ${MC} \"${MV}\" not in PATH!${EI}" && inc_err_cnt; 
 			true
 			}
 		;; 
 		INC)
 		true && { \
-			test "${VERBOSE}" -ge 3 && echo "NEED CHECK if $MV is OK"  
+			test "${VERBOSE}" -ge 3 && echo0 "NEED CHECK if $MV is OK"  
 			# TODO: write me
 			true
 			}
 		;; 
 		SHL)
 		true && { \
-			test "${VERBOSE}" -ge 3 && echo "NEED CHECK if $MV is OK"  
+			test "${VERBOSE}" -ge 3 && echo0 "NEED CHECK if $MV is OK"  
 			# TODO: write me
 			true
 			}
@@ -306,7 +312,7 @@ function check_on_ptn()
 			for RM in ${MI} ${MV}  ; do
 				test "${VERBOSE}" -ge 3 && echo "Checking if a module: $RM"  
 				test -z "`module_avail ${RM} 2>&1`" && \
-					echo "module ${MN} [${FN}] ${MC} \"${RM}\" not an available module!${EI}" && inc_err_cnt; 
+					echo0 "module ${MN} [${FN}] ${MC} \"${RM}\" not an available module!${EI}" && inc_err_cnt; 
 			done
 			}
 		;; 
