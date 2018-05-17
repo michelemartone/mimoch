@@ -146,6 +146,8 @@ function echoX()
 	fi
 }
 function echo0() { echoX ${FUNCNAME: -1} $@; }
+function echo1() { echoX ${FUNCNAME: -1} $@; }
+function echo2() { echoX ${FUNCNAME: -1} $@; }
 function echo3() { echoX ${FUNCNAME: -1} $@; }
 MISCTOCHECK=''
 INTOPTS='';
@@ -218,7 +220,7 @@ else
 	PATTERN=${2:-$PATTERN}
 	echo "# Will check through modules around ${MY_MODULEPATH}"
 	for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
-	test ${VERBOSE} -ge 1 && echo "# Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}"
+	echo1 "# Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}"
 	cd ${MD}
 	for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		FN=${MD}/${MF}
@@ -272,7 +274,7 @@ function check_on_ptn()
 	MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
 	MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
 	test -n "$MA" || return 0; # matching assignment
-	test "${VERBOSE}" -ge 2 && echo "Checking if match on ${PVID}: match; \"${MA}\""  
+	echo2 "Checking if match on ${PVID}: match; \"${MA}\"";
 	case $CHK in
 		DIR)
 		for PD in ${MV//:/ }; do # path directory
@@ -334,7 +336,7 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	CL=`echo ${CI} | sed "s/\(${NRE}\)\\+\(${ERE}\)/\2 /g"`
 	EI=''
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra contact info
-	test ${VERBOSE} -ge 1 && echo "Checking ${FN}"
+	echo1 "Checking ${FN}";
 	# TODO: need to decide whether 'setenv .*_DOC\>' shall be dir or file.
 	test "${VERBOSE}" -ge 4 && module show ${PWD}/${MN}
 	MERRS_CNT=0; # module mistakes count
@@ -367,7 +369,7 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 		mhelp_test
 	fi
 	test $MERRS_CNT = 0 || { TERRS_CNT=$((TERRS_CNT+MERRS_CNT)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
-	test ${VERBOSE} -ge 1 && echo "Checked ${FN}"
+	echo1 "Checked ${FN}"
 done    ; 
 	result_msg ${#MFA[@]} ${MEXET_CNT} ${TERRS_CNT} ${#FMA[@]}
 	echo " Took ${SECONDS}s".
