@@ -138,6 +138,14 @@ OPTSTRING="ad:hnqvCHILPSTX"
 #OPTSTRING="ah"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
+function echoX()
+{
+	if test ${VERBOSE} -ge ${1}; then
+		shift;
+		echo $@
+	fi
+}
+function echo0() { echoX ${FUNCNAME: -1} $@; }
 MISCTOCHECK=''
 INTOPTS='';
 DIRSTOCHECK=${DEF_DIRSTOCHECK}
@@ -248,12 +256,6 @@ function mhelp_test()
 		if eval "${CMD}" ; then
 			echo "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
 		fi
-}
-function echo0()
-{
-	if test ${VERBOSE} -ge ${FUNCNAME: -1}; then
-		echo $@
-	fi
 }
 function check_on_ptn()
 {
