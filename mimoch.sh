@@ -54,7 +54,7 @@ Where [options] are:
      -P            # prereq / conflict module existence check
      -S            # check link flags (unfinished: policy missing)
      -T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
-     -X            # if a *_USER_TEST variable is provided by a module, execute it in the shell using \`eval\` (implies module load/unload)
+     -X            # if a *_USER_TEST or *_CMD_TEST variable is provided by a module, execute it in the shell using \`eval\` (implies module load/unload)
 
 Will look for common mistakes in shell modulefiles.
 If any mistake if found, will exit with non-zero status.
@@ -368,7 +368,7 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 		check_on_ptn SHL 'setenv .*\(_SHLIB\|_LIB\|LDFLAGS\|LIBS\)\>'
 	fi
 	if [[ "$MISCTOCHECK" =~ X ]] ; then
-		check_on_ptn EXT 'setenv .*_USER_TEST\>'
+		check_on_ptn EXT 'setenv .*\(_USER_TEST\|_CMD_TEST\)\>'
 	fi
 	if [[ "$MISCTOCHECK" =~ L ]] ; then
 		echo3 "Checking load/unload ${FN}";
