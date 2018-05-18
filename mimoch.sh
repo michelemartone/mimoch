@@ -46,6 +46,7 @@ Where [options] are:
      -q            # decrease verbosity
      -v            # increase verbosity (up to 4 times)
      -n            # exit with zero status (as long as no internal errors encountered)
+     -m MAX        # will tolerate up to MAX mistakes before returning non-zero status
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
      -H            # check \`module help\` output
      -I            # check include flags (unfinished: policy missing)
@@ -135,8 +136,7 @@ EOF
 	exit
 }
 echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
-OPTSTRING="ad:hnqvCHILPSTX"
-#OPTSTRING="ah"
+OPTSTRING="ad:hm:nqvCHILPSTX"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 function echoX()
@@ -151,6 +151,7 @@ function echo1() { echoX ${FUNCNAME: -1} $@; }
 function echo2() { echoX ${FUNCNAME: -1} $@; }
 function echo3() { echoX ${FUNCNAME: -1} $@; }
 MISCTOCHECK=''
+MAX_MISTAKES=0;
 INTOPTS='';
 DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
@@ -158,6 +159,7 @@ while getopts $OPTSTRING NAME; do
 		#a) CHECK_WHAT='a';;
 		a) DIRSTOCHECK=${DEF_DIRSTOCHECK}; MISCTOCHECK='H';;
 		h) on_help;;
+		m) MAX_MISTAKES="$OPTARG"; [[ "$MAX_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-m switch needs a number! you gave ${MAX_MISTAKES}"; false; };;
 		n) INTOPTS=n;;
 		q) VERBOSE=$((VERBOSE-1));;
 		v) VERBOSE=$((VERBOSE+1));;
@@ -173,7 +175,9 @@ while getopts $OPTSTRING NAME; do
 		*) false
 	esac
 done
+true
 shift $((OPTIND-1))
+test ${MAX_MISTAKES} -gt 0 && echo0 "# Will tolerate up to ${MAX_MISTAKES} mistakes before returning non-zero status"
 TERRS_CNT=0; # total module mistakes count
 MEXET_CNT=0; # module execution tests count
 declare -a VIDP
@@ -383,7 +387,7 @@ if test ${TERRS_CNT} != 0; then
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
 	if test -n "${CL}" ; then echo "Modules mention email addresses: ${CL}."; fi
 	#for MR in "${MRA[@]}" ; do echo Contact: ${MR}; done
-	if [[ "$INTOPTS" =~ n ]]; then exit 0; else exit -1; fi
+	if [[ "$INTOPTS" =~ n ]] || test ${TERRS_CNT} -le ${MAX_MISTAKES}; then exit 0; else exit -1; fi
 else
 	true;
 fi
