@@ -223,8 +223,8 @@ else
 	MY_MODULEPATH=${1:-$MODULEPATH}
 	test -f "${MY_MODULEPATH}" -a -n "${MY_MODULEPATH}" && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
 	PATTERN=${2:-$PATTERN}
-	echo "# Will scan for modules through ${MY_MODULEPATH}"
-	for MD in  ${MY_MODULEPATH//:/ } ; do # modules directory
+	echo "# Will scan for modulefiles through ${MY_MODULEPATH}"
+	for MD in  ${MY_MODULEPATH//:/ } ; do # modulefiles directory
 	echo1 "# Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}"
 	cd ${MD}
 	for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
@@ -385,7 +385,7 @@ done    ;
 	echo " Took ${SECONDS}s".
 if test ${TERRS_CNT} != 0; then
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
-	if test -n "${CL}" ; then echo "Modules mention email addresses: ${CL}."; fi
+	if test -n "${CL}" ; then echo "Modulefiles mention email addresses: ${CL}."; fi
 	#for MR in "${MRA[@]}" ; do echo Contact: ${MR}; done
 	if [[ "$INTOPTS" =~ n ]] || test ${TERRS_CNT} -le ${MAX_MISTAKES}; then exit 0; else exit -1; fi
 else
