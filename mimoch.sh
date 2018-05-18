@@ -253,7 +253,7 @@ function mlamu_test()
 {
 		test -n "$1"
 		CMD="( cd && module load ${MN} && eval ${1} && module unload ${MN}; )"
-		eval "${CMD}" || { echo "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt; } 
+		eval "${CMD}" || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt; } 
 }
 function mhelp_test()
 {
@@ -262,7 +262,7 @@ function mhelp_test()
 		test ${VERBOSE} -ge 4 && eval "${CMD}"
 		CMD="${CMD} 2>&1 | grep -q '^ERROR:'"
 		if eval "${CMD}" ; then
-			echo "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
+			echo0 "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
 		fi
 }
 function check_on_ptn()
