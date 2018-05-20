@@ -263,6 +263,7 @@ function mlamu_test()
 {
 		test -n "$1"
 		CMD="( cd && module load ${MN} && eval ${1} && module unload ${MN}; )"
+		test ${VERBOSE} -lt 4 && CMD+=" 2>&1 > ${DEV_NULL}"
 		eval "${CMD}" || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt; } 
 }
 function mhelp_test()
@@ -299,7 +300,11 @@ function check_on_ptn()
 		;; 
 		EXT)
 			MV="`echo ${MPL} | cut -d \  -f 3- `" # this tolerates spaces
-			echo3 "Module $MN offers test commands variable $MI, defined as $MV"
+			if test "${VERBOSE}" -ge 3 ; then
+				echo3 "Module $MN offers test commands variable $MI, defined as: $MV"
+			else
+				echo2 "Module $MN offers test commands variable $MI"
+			fi
 			#echo CMD $CMD
 			MEXET_CNT=$((MEXET_CNT+1));
 			mlamu_test "\${$MI}"
