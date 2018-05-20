@@ -178,6 +178,7 @@ done
 true
 shift $((OPTIND-1))
 test ${MAX_MISTAKES} -gt 0 && echo0 "# Will tolerate up to ${MAX_MISTAKES} mistakes before returning non-zero status"
+PERRS_CNT=0; # modulepath mistakes count
 TERRS_CNT=0; # total module mistakes count
 MEXET_CNT=0; # module execution tests count
 declare -a VIDP
@@ -226,6 +227,7 @@ else
 	echo "# Will scan for modulefiles through ${MY_MODULEPATH}"
 	for MD in  ${MY_MODULEPATH//:/ } ; do # modulefiles directory
 	echo1 "# Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}"
+	test -d ${MD} || { PERRS_CNT=$((PERRS_CNT+1)); echo0 "# Ignoring non-existing subpath ${MD} (counts as mistake)"; continue; }
 	cd ${MD}
 	for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		FN=${MD}/${MF}
@@ -243,6 +245,7 @@ else
 	done
 	done
 fi
+TERRS_CNT=$((TERRS_CNT+PERRS_CNT));
 #set -x
 function inc_err_cnt()
 {
