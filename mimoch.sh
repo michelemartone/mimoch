@@ -48,6 +48,7 @@ Where [options] are:
      -n            # exit with zero status (as long as no internal errors encountered)
      -m MAX        # will tolerate up to MAX mistakes before returning non-zero status
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
+     -E            # check and expand (via \'module avail\') list of specified modules
      -H            # check \`module help\` output
      -I            # check include flags (unfinished: policy missing)
      -L            # check \`module load\` / \`module unload\`
@@ -136,7 +137,7 @@ EOF
 	exit
 }
 echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
-OPTSTRING="ad:hm:nqvCHILPSTX"
+OPTSTRING="ad:hm:nqvCEHILPSTX"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 function echoX()
@@ -164,6 +165,7 @@ while getopts $OPTSTRING NAME; do
 		q) VERBOSE=$((VERBOSE-1));;
 		v) VERBOSE=$((VERBOSE+1));;
 		C) MISCTOCHECK+="C";;
+		E) MISCTOCHECK+="E";;
 		H) MISCTOCHECK+="H";;
 		I) MISCTOCHECK+="I";;
 		L) MISCTOCHECK+="L";;
@@ -195,8 +197,13 @@ declare -a FMA # faulty modulefiles array
 test -z "${MODULEPATH}" && { echo "# Your MODULEPATH variable is empty. Expect trouble!"; }
 if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 	for ARG ; do
-		AM=`module_avail ${ARG}`
-		echo "# Specified $ARG, addressing modules: $AM"
+		if [[ "$MISCTOCHECK" =~ E ]] ; then
+			AM=`module_avail ${ARG}`
+			echo0 "# Specified $ARG, addressing modules: $AM"
+		else
+			AM=${ARG}
+			echo0 "# Specified modules $ARG (no expansion)."
+		fi
 		for MN in ${AM}; do
 			MN=${MN/\(*/} # clean up of e.g. '(default)' suffix
 			FN=$(module path ${MN});
