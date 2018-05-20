@@ -301,9 +301,9 @@ function check_on_ptn()
 		EXT)
 			MV="`echo ${MPL} | cut -d \  -f 3- `" # this tolerates spaces
 			if test "${VERBOSE}" -ge 3 ; then
-				echo3 "Module $MN offers test commands variable $MI, defined as: $MV"
+				echo3 "Module $MN offers test commands variable $MI to be run; defined as: $MV"
 			else
-				echo2 "Module $MN offers test commands variable $MI"
+				echo2 "Module $MN offers test commands variable $MI - testing it."
 			fi
 			#echo CMD $CMD
 			MEXET_CNT=$((MEXET_CNT+1));
