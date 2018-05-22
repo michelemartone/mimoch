@@ -207,7 +207,9 @@ if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 		for MN in ${AM}; do
 			MN=${MN/\(*/} # clean up of e.g. '(default)' suffix
 			FN=$(module path ${MN});
-			MD=${FN/%${MN}};
+			MD=${FN/%${MN}}; # cut postfix
+			MN=${FN/#${MD}}; # cat prefix
+			test "${FN}" = "${MD}${MN}"
 			MFA+=(${FN});
 			MNA+=(${MN});
 			MDA+=(${MD});
@@ -352,7 +354,7 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	FN="${MFA[$MFI]}" ;
 	MN="${MNA[$MFI]}" ;
 	MD="${MDA[$MFI]}" ;
-	# echo "# Will check module ${MN}, modulefile ${FN}"
+	echo3 "# Will check module ${MN}, modulefile ${FN}, in dir ${MD}"
 	cd ${MD}
 	CI=`grep @ ${MN} || true` 
 	ERE='[a-zA-Z.]\+@[a-zA-Z]\+.[a-zA-Z]\+'
