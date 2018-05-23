@@ -198,16 +198,15 @@ declare -a FMA # faulty modulefiles array
 test -z "${MODULEPATH}" && { echo "# Your MODULEPATH variable is empty. Expect trouble!"; }
 if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 	for ARG ; do
+		AM=`module_avail ${ARG}`
 		if [[ "$MISCTOCHECK" =~ E ]] ; then
-			AM=`module_avail ${ARG}`
-			echo0 "# Specified $ARG, expanding to modules: $AM"
+			echo0 "# Specified $ARG, expanding to modules: ${AM}"
 		else
-			AM=${ARG}
-			if test "${AM}" != "`module_avail ${ARG}`" ; then
-				echo0 "# No module simply named $AM (maybe try expansion with -E ?)."
+			if test "${ARG}" != "${AM}" ; then
+				echo0 "# No module simply named ${ARG} (maybe try expansion with -E ?)."
 				continue
 			else
-				echo0 "# Specified modules $ARG (no expansion)."
+				echo0 "# Specified modules ${ARG} (no expansion)."
 			fi
 		fi
 		for MN in ${AM}; do
