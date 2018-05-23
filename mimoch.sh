@@ -151,6 +151,7 @@ function echo0() { echoX ${FUNCNAME: -1} $@; }
 function echo1() { echoX ${FUNCNAME: -1} $@; }
 function echo2() { echoX ${FUNCNAME: -1} $@; }
 function echo3() { echoX ${FUNCNAME: -1} $@; }
+function echo4() { echoX ${FUNCNAME: -1} $@; }
 MISCTOCHECK=''
 MAX_MISTAKES=0;
 INTOPTS='';
@@ -215,6 +216,7 @@ if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 			MD=${FN/%${MN}}; # cut postfix
 			MN=${FN/#${MD}}; # cat prefix
 			test "${FN}" = "${MD}${MN}"
+			if test ! -d "${MD}" ; then echo4 "# skipping ${MD}: not a directory (you might have same-named modules in different dirs: fine)"; continue; fi; 
 			MFA+=(${FN});
 			MNA+=(${MN});
 			MDA+=(${MD});
