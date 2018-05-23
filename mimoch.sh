@@ -199,10 +199,15 @@ if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 	for ARG ; do
 		if [[ "$MISCTOCHECK" =~ E ]] ; then
 			AM=`module_avail ${ARG}`
-			echo0 "# Specified $ARG, addressing modules: $AM"
+			echo0 "# Specified $ARG, expanding to modules: $AM"
 		else
 			AM=${ARG}
-			echo0 "# Specified modules $ARG (no expansion)."
+			if test "${AM}" != "`module_avail ${ARG}`" ; then
+				echo0 "# No module simply named $AM (maybe try expansion with -E ?)."
+				continue
+			else
+				echo0 "# Specified modules $ARG (no expansion)."
+			fi
 		fi
 		for MN in ${AM}; do
 			MN=${MN/\(*/} # clean up of e.g. '(default)' suffix
