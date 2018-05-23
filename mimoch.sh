@@ -199,6 +199,7 @@ test -z "${MODULEPATH}" && { echo "# Your MODULEPATH variable is empty. Expect t
 if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 	for ARG ; do
 		AM=`module_avail ${ARG}`
+		AM=${AM// /} 
 		if [[ "$MISCTOCHECK" =~ E ]] ; then
 			echo0 "# Specified $ARG, expanding to modules: ${AM}"
 		else
