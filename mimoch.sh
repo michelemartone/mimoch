@@ -302,6 +302,7 @@ function check_on_ptn()
 	case $CHK in
 		DIR)
 		for PD in ${MV//:/ }; do # path directory
+			# test ${PD:0:1} = "#" && { echo2 "# Directory variable value begins with #: will be ignored (${MI}=${PD})." ; break; }
 			echo3 "Checking if $MI is a dir: $PD";
 			test -d ${PD} || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt; } 
 		done; 
