@@ -47,6 +47,7 @@ Where [options] are:
      -v            # increase verbosity (up to 4 times)
      -n            # exit with zero status (as long as no internal errors encountered)
      -m MAX        # will tolerate up to MAX mistakes before returning non-zero status
+     -#            # tolerate a *.DIR variable value whose value begins with \"#\"
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
      -E            # check and expand (via \'module avail\') list of specified modules
      -H            # check \`module help\` output
@@ -137,7 +138,7 @@ EOF
 	exit
 }
 echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
-OPTSTRING="ad:hm:nqvCEHILPSTX"
+OPTSTRING="ad:hm:nqv#CEHILPSTX"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 function echoX()
@@ -165,6 +166,7 @@ while getopts $OPTSTRING NAME; do
 		n) INTOPTS=n;;
 		q) VERBOSE=$((VERBOSE-1));;
 		v) VERBOSE=$((VERBOSE+1));;
+		"#") MISCTOCHECK+="#";; # TODO: missing test case
 		C) MISCTOCHECK+="C";;
 		E) MISCTOCHECK+="E";;
 		H) MISCTOCHECK+="H";;
@@ -302,7 +304,7 @@ function check_on_ptn()
 	case $CHK in
 		DIR)
 		for PD in ${MV//:/ }; do # path directory
-			# test ${PD:0:1} = "#" && { echo2 "# Directory variable value begins with #: will be ignored (${MI}=${PD})." ; break; }
+			[[ "$MISCTOCHECK" =~ "#" ]] && test ${PD:0:1} = "#" && { echo0 "# Directory variable value begins with #: will be ignored (${MI}=${PD})." ; break; }
 			echo3 "Checking if $MI is a dir: $PD";
 			test -d ${PD} || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt; } 
 		done; 
