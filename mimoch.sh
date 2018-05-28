@@ -289,6 +289,7 @@ function mlamu_test()
 	eval "${CMD}" || { 
 		echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt;
 		[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MI}=${MV} test fails" "${MI}" "${MV}" "${EI}"
+		true;
 	 } 
 }
 function mhelp_test()
@@ -326,6 +327,7 @@ function check_on_ptn()
 			test -d ${PD} || { 
 				echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt;
 				[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MI}=${PD} not a directory" "${MI}" "${PD}" "${EI}"
+				true;
 			 } 
 		done; 
 		;; 
