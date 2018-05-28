@@ -279,7 +279,7 @@ function inc_err_cnt()
 }
 function mistake_csv()
 {
-	echo "TAB:	${1//	/}	${2//	/}	${3//	/}	${4//	/}"
+	echo "TAB:	${1//	/}	${2//	/}	${3//	/}	${4//	/}	${5//	/}	${6//	/}"
 }
 function mlamu_test()
 {
@@ -288,7 +288,7 @@ function mlamu_test()
 	test ${VERBOSE} -lt 4 && CMD+=" 2>&1 > ${DEV_NULL}"
 	eval "${CMD}" || { 
 		echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt;
-		[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MI}=${MV} test fails" "${EI}"
+		[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MI}=${MV} test fails" "${MI}" "${MV}" "${EI}"
 	 } 
 }
 function mhelp_test()
@@ -299,7 +299,7 @@ function mhelp_test()
 	CMD="${CMD} 2>&1 | grep -q '^ERROR:'"
 	if eval "${CMD}" ; then
 		echo0 "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
-		[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${FN} emits 'ERROR'!" "${EI}"
+		[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${FN} emits 'ERROR'!" "" "" "${EI}"
 	fi
 }
 function check_on_ptn()
@@ -325,7 +325,7 @@ function check_on_ptn()
 			echo3 "Checking if $MI is a dir: $PD";
 			test -d ${PD} || { 
 				echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt;
-				[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MI}=${PD} not a directory" "${EI}"
+				[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MI}=${PD} not a directory" "${MI}" "${PD}" "${EI}"
 			 } 
 		done; 
 		;; 
@@ -345,7 +345,7 @@ function check_on_ptn()
 			echo3 "Checking if $MV in PATH"  
 			if test -z "`my_which ${MV}`" ; then
 				echo0 "module ${MN} [${FN}] ${MC} \"${MV}\" not in PATH!${EI}" && inc_err_cnt; 
-				[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MV} not in PATH!" "${EI}"
+				[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MV} not in PATH!" "${MC}" "${MV}" "${EI}"
 			fi; true
 			}
 		;; 
@@ -381,7 +381,7 @@ function check_on_ptn()
 				echo3 "Checking if a module: $RM"  
 				if test -z "`module_avail ${RM} 2>&1`" ; then
 					echo0 "module ${MN} [${FN}] ${MC} \"${RM}\" not an available module!${EI}" && inc_err_cnt; 
-					[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${RM} not an available module!" "${EI}"
+					[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${RM} not an available module!" "${MC}" "${RM}" "${EI}"
 				fi
 			done
 			}
@@ -391,7 +391,7 @@ function check_on_ptn()
 	done < <( echo "$MMPL" ) # process substitution
 }
 [[ "$MISCTOCHECK" =~ t ]] && echo0 "# The following line is header of TAB-separated output you requested." \
-			  && mistake_csv MODULE FIRSTCONTACT MISTAKE CONTACTS
+			  && mistake_csv MODULE FIRSTCONTACT MISTAKE KEY VALUE CONTACTS
 for MFI in `seq 0 $((${#MFA[@]}-1))`; do 
 	FN="${MFA[$MFI]}" ;
 	MN="${MNA[$MFI]}" ;
