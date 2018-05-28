@@ -390,6 +390,8 @@ function check_on_ptn()
 	esac
 	done < <( echo "$MMPL" ) # process substitution
 }
+[[ "$MISCTOCHECK" =~ t ]] && echo0 "# The following line is header of TAB-separated output you requested." \
+			  && mistake_csv MODULE CONTACTS MISTAKE
 for MFI in `seq 0 $((${#MFA[@]}-1))`; do 
 	FN="${MFA[$MFI]}" ;
 	MN="${MNA[$MFI]}" ;
