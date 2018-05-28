@@ -301,6 +301,7 @@ function mhelp_test()
 	if eval "${CMD}" ; then
 		echo0 "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
 		[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${FN} emits 'ERROR'!" "" "" "${EI}"
+		true;
 	fi
 }
 function check_on_ptn()
