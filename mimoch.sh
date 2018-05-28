@@ -187,6 +187,8 @@ done
 true
 shift $((OPTIND-1))
 test ${MAX_MISTAKES} -gt 0 && echo0 "# Will tolerate up to ${MAX_MISTAKES} mistakes before returning non-zero status"
+[[ "$MISCTOCHECK" =~ "#" ]] && { echo1 "# Directory variable value beginning with # will be ignored."; }
+[[ "$MISCTOCHECK" =~ "%" ]] && { echo1 "# Directory variable value beginning with % will be ignored."; }
 PERRS_CNT=0; # modulepath mistakes count
 TERRS_CNT=0; # total module mistakes count
 MEXET_CNT=0; # module execution tests count
@@ -308,8 +310,8 @@ function check_on_ptn()
 	case $CHK in
 		DIR)
 		for PD in ${MV//:/ }; do # path directory
-			[[ "$MISCTOCHECK" =~ "#" ]] && test ${PD:0:1} = "#" && { echo0 "# Directory variable value begins with #: will be ignored (${MI}=${PD})." ; break; }
-			[[ "$MISCTOCHECK" =~ "%" && "$PD" =~ "%" ]] && { echo0 "# Directory variable value contains %: will be ignored (${MI}=${PD})." ; break; }
+			[[ "$MISCTOCHECK" =~ "#" ]] && test ${PD:0:1} = "#" && { echo3 "# Directory variable value begins with #: will be ignored (${MI}=${PD})." ; break; }
+			[[ "$MISCTOCHECK" =~ "%" && "$PD" =~ "%" ]] && { echo3 "# Directory variable value contains %: will be ignored (${MI}=${PD})." ; break; }
 			echo3 "Checking if $MI is a dir: $PD";
 			test -d ${PD} || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt; } 
 		done; 
