@@ -331,6 +331,14 @@ function check_on_ptn()
 			true
 			}
 		;; 
+		MEL)
+		true && { \
+			test -z "`my_which ${MV}`" && \
+				echo3 "Found MAINTAINER info: ${MV}" && \
+				EI="[${MV//;/,}]"
+			true
+			}
+		;; 
 		INC)
 		true && { \
 			echo3 "NEED CHECK if $MV is OK"  
@@ -373,13 +381,16 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	NRE='[^@]\+\s\+'
 	CL=`echo ${CI} | sed "s/\(${NRE}\)\\+\(${ERE}\)/\2 /g"`
 	EI=''
-	test -n "${CL}" && EI=" [${CL/% /}]" # extra contact info
+	test -n "${CL}" && EI=" [${CL/% /}]" # extra contact info, from the comments (old way)
 	echo1 "Checking ${FN}";
 	# TODO: policy missing here. E.g.:
 	#  To decide whether 'setenv .*_DOC\>' shall be dir or file.
 	test "${VERBOSE}" -ge 4 && module show ${PWD}/${MN}
 	MERRS_CNT=0; # module mistakes count
 	MS=`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep -v '^\(--\|module-whatis\|  *\)'  `
+	if [[ "$MISCTOCHECK" =~ m ]] ; then
+		check_on_ptn MEL 'setenv .*\(_MAINTAINER_LIST\)\>'
+	fi
 	for PVID in "${VIDP[@]}" ;
 		do
 		check_on_ptn DIR "$PVID"; continue
