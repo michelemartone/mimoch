@@ -277,20 +277,20 @@ function inc_err_cnt()
 }
 function mlamu_test()
 {
-		test -n "$1"
-		CMD="( cd && module load ${MN} && eval ${1} && module unload ${MN}; )"
-		test ${VERBOSE} -lt 4 && CMD+=" 2>&1 > ${DEV_NULL}"
-		eval "${CMD}" || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt; } 
+	test -n "$1"
+	CMD="( cd && module load ${MN} && eval ${1} && module unload ${MN}; )"
+	test ${VERBOSE} -lt 4 && CMD+=" 2>&1 > ${DEV_NULL}"
+	eval "${CMD}" || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt; } 
 }
 function mhelp_test()
 {
-		test -n "$MN"
-		CMD="( module help ${MN}; )"
-		test ${VERBOSE} -ge 4 && eval "${CMD}"
-		CMD="${CMD} 2>&1 | grep -q '^ERROR:'"
-		if eval "${CMD}" ; then
-			echo0 "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
-		fi
+	test -n "$MN"
+	CMD="( module help ${MN}; )"
+	test ${VERBOSE} -ge 4 && eval "${CMD}"
+	CMD="${CMD} 2>&1 | grep -q '^ERROR:'"
+	if eval "${CMD}" ; then
+		echo0 "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
+	fi
 }
 function check_on_ptn()
 {
