@@ -279,7 +279,7 @@ function inc_err_cnt()
 }
 function mistake_csv()
 {
-	echo "TAB:${1//	/}	${2//	/}	${3//	/}"
+	echo "TAB:	${1//	/}	${2//	/}	${3//	/}"
 }
 function mlamu_test()
 {
