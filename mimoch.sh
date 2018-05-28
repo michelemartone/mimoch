@@ -36,7 +36,7 @@ LMC_HELP="Usage alternatives:
     $0 [options] <module-name> ...                               # check specific modules (assumes a sane MODULEPATH)
     $0 [options] [[<modulefiles-dirpath>] <filter-find-pattern>] # search and check modulefiles
 Where [options] are:
-     -a            # short for '-d ${DEF_DIRSTOCHECK} -H'
+     -a            # short for '-d ${DEF_DIRSTOCHECK} -H -M'
      -d SPECSTRING # check existence of specified directories. By default: ${DEF_DIRSTOCHECK}, where
                    # p: check .*PATH variables
                    # d: check .*DIR  variables
@@ -54,6 +54,7 @@ Where [options] are:
      -H            # check \`module help\` output
      -I            # check include flags (unfinished: policy missing)
      -L            # check \`module load\` / \`module unload\`
+     -M            # fetch contact list from a *_MAINTAINER_INFO variable
      -P            # prereq / conflict module existence check
      -S            # check link flags (unfinished: policy missing)
      -T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
@@ -139,7 +140,7 @@ EOF
 	exit
 }
 echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
-OPTSTRING="ad:hm:nqv#%CEHILPSTX"
+OPTSTRING="ad:hm:nqv#%CEHILMPSTX"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 function echoX()
@@ -161,7 +162,7 @@ DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
 	case $NAME in
 		#a) CHECK_WHAT='a';;
-		a) DIRSTOCHECK=${DEF_DIRSTOCHECK}; MISCTOCHECK='H';;
+		a) DIRSTOCHECK=${DEF_DIRSTOCHECK}; MISCTOCHECK='HM';;
 		h) on_help;;
 		m) MAX_MISTAKES="$OPTARG"; [[ "$MAX_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-m switch needs a number! you gave ${MAX_MISTAKES}"; false; };;
 		n) INTOPTS=n;;
@@ -174,6 +175,7 @@ while getopts $OPTSTRING NAME; do
 		H) MISCTOCHECK+="H";;
 		I) MISCTOCHECK+="I";;
 		L) MISCTOCHECK+="L";;
+		M) MISCTOCHECK+="M";;
 		P) MISCTOCHECK+="P";;
 		S) MISCTOCHECK+="S";;
 		X) MISCTOCHECK+="X";;
@@ -388,7 +390,7 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	test "${VERBOSE}" -ge 4 && module show ${PWD}/${MN}
 	MERRS_CNT=0; # module mistakes count
 	MS=`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep -v '^\(--\|module-whatis\|  *\)'  `
-	if [[ "$MISCTOCHECK" =~ m ]] ; then
+	if [[ "$MISCTOCHECK" =~ M ]] ; then
 		check_on_ptn MEL 'setenv .*\(_MAINTAINER_LIST\)\>'
 	fi
 	for PVID in "${VIDP[@]}" ;
