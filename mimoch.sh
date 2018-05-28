@@ -43,6 +43,7 @@ Where [options] are:
                    # s: check .*_SRC variables
                    # b: check .*BASE variables
      -h            # print help and exit
+     -t            # additional TAB-columnated and \"TAB:\"-prefixed output (easily grep'able, three columns)
      -q            # decrease verbosity
      -v            # increase verbosity (up to 4 times)
      -n            # exit with zero status (as long as no internal errors encountered)
@@ -140,7 +141,7 @@ EOF
 	exit
 }
 echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
-OPTSTRING="ad:hm:nqv#%CEHILMPSTX"
+OPTSTRING="ad:hm:nqtv#%CEHILMPSTX"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 function echoX()
@@ -167,6 +168,7 @@ while getopts $OPTSTRING NAME; do
 		m) MAX_MISTAKES="$OPTARG"; [[ "$MAX_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-m switch needs a number! you gave ${MAX_MISTAKES}"; false; };;
 		n) INTOPTS=n;;
 		q) VERBOSE=$((VERBOSE-1));;
+		t) MISCTOCHECK+="t";; # TODO: missing test case
 		v) VERBOSE=$((VERBOSE+1));;
 		"#") MISCTOCHECK+="#";; # TODO: missing test case
 		"%") MISCTOCHECK+="%";; # TODO: missing test case
@@ -275,12 +277,19 @@ function inc_err_cnt()
 	MERRS_CNT=$((MERRS_CNT+1));
 	echo3 "# this/total mistakes detected: $MERRS_CNT/$TERRS_CNT";
 }
+function mistake_csv()
+{
+	echo "TAB:${1//	/}	${2//	/}	${3//	/}"
+}
 function mlamu_test()
 {
 	test -n "$1"
 	CMD="( cd && module load ${MN} && eval ${1} && module unload ${MN}; )"
 	test ${VERBOSE} -lt 4 && CMD+=" 2>&1 > ${DEV_NULL}"
-	eval "${CMD}" || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt; } 
+	eval "${CMD}" || { 
+		echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt;
+		[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${EI}" "${MI}=${MV} test fails"
+	 } 
 }
 function mhelp_test()
 {
@@ -290,6 +299,7 @@ function mhelp_test()
 	CMD="${CMD} 2>&1 | grep -q '^ERROR:'"
 	if eval "${CMD}" ; then
 		echo0 "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
+		[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${EI}" "${FN} emits 'ERROR'!"
 	fi
 }
 function check_on_ptn()
@@ -313,7 +323,10 @@ function check_on_ptn()
 			[[ "$MISCTOCHECK" =~ "#" ]] && test ${PD:0:1} = "#" && { echo3 "# Directory variable value begins with #: will be ignored (${MI}=${PD})." ; break; }
 			[[ "$MISCTOCHECK" =~ "%" && "$PD" =~ "%" ]] && { echo3 "# Directory variable value contains %: will be ignored (${MI}=${PD})." ; break; }
 			echo3 "Checking if $MI is a dir: $PD";
-			test -d ${PD} || { echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt; } 
+			test -d ${PD} || { 
+				echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt;
+				[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${EI}" "${MI}=${PD} not a directory"
+			 } 
 		done; 
 		;; 
 		EXT)
@@ -330,9 +343,10 @@ function check_on_ptn()
 		CMP)
 		true && { \
 			echo3 "Checking if $MV in PATH"  
-			test -z "`my_which ${MV}`" && \
+			if test -z "`my_which ${MV}`" ; then
 				echo0 "module ${MN} [${FN}] ${MC} \"${MV}\" not in PATH!${EI}" && inc_err_cnt; 
-			true
+				[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${EI}" "${MV} not in PATH!"
+			fi; true
 			}
 		;; 
 		MEL)
@@ -365,8 +379,10 @@ function check_on_ptn()
 		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
 			for RM in ${MI} ${MV}  ; do
 				echo3 "Checking if a module: $RM"  
-				test -z "`module_avail ${RM} 2>&1`" && \
+				if test -z "`module_avail ${RM} 2>&1`" ; then
 					echo0 "module ${MN} [${FN}] ${MC} \"${RM}\" not an available module!${EI}" && inc_err_cnt; 
+					[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${EI}" "${RM} not an available module!"
+				fi
 			done
 			}
 		;; 
