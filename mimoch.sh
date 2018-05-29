@@ -32,8 +32,8 @@ function module_avail()
 DEF_DIRSTOCHECK='bdps' # see DIRSTOCHECK
 LMC_HELP="Usage alternatives:
 
-    $0 [options] <full-modulefile-pathname> ...                  # check specified modulefiles
-    $0 [options] <module-name> ...                               # check specific modules (assumes a sane MODULEPATH)
+    $0 [options] <module-name> ...              # check specific modules (preferred style: uses existing MODULEPATH)
+    $0 [options] <full-modulefile-pathname> ... # check specified modulefiles (fragile: assumes its dirname to be MODULEPATH)
     $0 [options] [[<modulefiles-dirpath>] <filter-find-pattern>] # search and check modulefiles
 Where [options] are:
      -a            # short for '-d ${DEF_DIRSTOCHECK} -H -M'
