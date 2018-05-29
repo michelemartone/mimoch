@@ -246,23 +246,26 @@ elif test -f "${1}" -a ! -d "${1}" ; then
 	done
 else
 	USER_MP="$1"
+	test -n "${USER_MP}" && echo1 "# User provided custom modules path: \"${USER_MP}\""
 	MY_MODULEPATH=${1:-$MODULEPATH}
 	test -f "${MY_MODULEPATH}" -a -n "${MY_MODULEPATH}" && MY_MODULEPATH=`dirname ${MY_MODULEPATH}`
 	PATTERN=${2:-$PATTERN}
 	echo "# Will scan for modulefiles through ${MY_MODULEPATH}"
 	for MD in  ${MY_MODULEPATH//:/ } ; do # modulefiles directory
-	echo1 "# Looking into ${MD} ${PATTERN:+ with pattern $PATTERN}"
+	echo1 "# Looking into directory ${MD} ${PATTERN:+ with pattern $PATTERN}"
 	test -d ${MD} || { PERRS_CNT=$((PERRS_CNT+1)); echo0 "# Ignoring non-existing subpath ${MD} (counts as mistake)"; continue; }
-	cd ${MD}
+	cd ${MD} && echo3 "# Stepped into directory ${MD}; will look for module files, with pattern \"${PATTERN}\"."
 	for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		FN=${MD}/${MF}
 		bn=`basename ${MF}`; test ${bn:0:1} = . && continue # no hidden files
 		grep -l '#%Module' 2>&1 >${DEV_NULL} ${MF}  || continue # skip non-module files
 		#MN=`echo ${MF} | sed 's/\s\s*/ /g' | rev | awk  -F / '{print $1"/"$2 }'| rev` # module name
+		echo4 "# Found modulefile ${MF}"
 		MN=${MF}
-		MO="`module_avail ${MN}`"
+		MO="`MODULEPATH=${MD} module_avail ${MN}`"
 		#test -z "${MO}" && { echo "internal error with module avail ${MN}: ${MF}!"; exit 1; } # we assert module to be valid
 		if test ! -f "${USER_MP}" ; then test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; }; fi # e.g. tempdir/1.0~
+		echo4 "# Modulefile is contained in the custom module path."
 		MFA+=(${FN});
 		MNA+=(${MN});
 		MDA+=(${MD});
