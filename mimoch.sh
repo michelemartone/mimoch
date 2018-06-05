@@ -157,7 +157,7 @@ function echo2() { echoX ${FUNCNAME: -1} $@; }
 function echo3() { echoX ${FUNCNAME: -1} $@; }
 function echo4() { echoX ${FUNCNAME: -1} $@; }
 MISCTOCHECK=''
-MAX_MISTAKES=0;
+IGN_MISTAKES=0;
 INTOPTS='';
 DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
@@ -165,7 +165,7 @@ while getopts $OPTSTRING NAME; do
 		#a) CHECK_WHAT='a';;
 		a) DIRSTOCHECK=${DEF_DIRSTOCHECK}; MISCTOCHECK='HM';;
 		h) on_help;;
-		m) MAX_MISTAKES="$OPTARG"; [[ "$MAX_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-m switch needs a number! you gave ${MAX_MISTAKES}"; false; };;
+		m) IGN_MISTAKES="$OPTARG"; [[ "$IGN_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-m switch needs a number! you gave ${IGN_MISTAKES}"; false; };;
 		n) INTOPTS=n;;
 		q) VERBOSE=$((VERBOSE-1));;
 		t) MISCTOCHECK+="t";MISCTOCHECK+="M";; # TODO: missing test case
@@ -188,7 +188,7 @@ while getopts $OPTSTRING NAME; do
 done
 true
 shift $((OPTIND-1))
-test ${MAX_MISTAKES} -gt 0 && echo0 "# Will tolerate up to ${MAX_MISTAKES} mistakes before returning non-zero status"
+test ${IGN_MISTAKES} -gt 0 && echo0 "# Will tolerate up to ${IGN_MISTAKES} mistakes before returning non-zero status"
 [[ "$MISCTOCHECK" =~ "#" ]] && { echo1 "# Directory variable value beginning with # will be ignored."; }
 [[ "$MISCTOCHECK" =~ "%" ]] && { echo1 "# Directory variable value beginning with % will be ignored."; }
 PERRS_CNT=0; # modulepath mistakes count
@@ -455,7 +455,7 @@ if test ${TERRS_CNT} != 0; then
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
 	if test -n "${CL}" ; then echo "Modulefiles mention email addresses: ${CL}."; fi
 	#for MR in "${MRA[@]}" ; do echo Contact: ${MR}; done
-	if [[ "$INTOPTS" =~ n ]] || test ${TERRS_CNT} -le ${MAX_MISTAKES}; then exit 0; else exit -1; fi
+	if [[ "$INTOPTS" =~ n ]] || test ${TERRS_CNT} -le ${IGN_MISTAKES}; then exit 0; else exit -1; fi
 else
 	true;
 fi
