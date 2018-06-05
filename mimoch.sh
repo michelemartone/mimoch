@@ -48,6 +48,7 @@ Where [options] are:
      -v            # increase verbosity (up to 4 times)
      -n            # exit with zero status (as long as no internal errors encountered)
      -i MAX        # will return non-zero status only if more than MAX mistakes found
+     -m MAX        # will exit and return non-zero status immediately as soon MAX mistakes are reached
      -#            # tolerate a *.DIR or *.PATH variable value whose value begins with \"#\"
      -%            # tolerate a *.DIR or *.PATH variable value whose value contains \"%\"
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
@@ -141,7 +142,7 @@ EOF
 	exit
 }
 echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
-OPTSTRING="ad:hi:nqtv#%CEHILMPSTX"
+OPTSTRING="ad:hi:m:nqtv#%CEHILMPSTX"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 function echoX()
@@ -158,6 +159,7 @@ function echo3() { echoX ${FUNCNAME: -1} $@; }
 function echo4() { echoX ${FUNCNAME: -1} $@; }
 MISCTOCHECK=''
 IGN_MISTAKES=0;
+MAX_MISTAKES=0;
 INTOPTS='';
 DIRSTOCHECK=${DEF_DIRSTOCHECK}
 while getopts $OPTSTRING NAME; do
@@ -166,6 +168,7 @@ while getopts $OPTSTRING NAME; do
 		a) DIRSTOCHECK=${DEF_DIRSTOCHECK}; MISCTOCHECK='HM';;
 		h) on_help;;
 		i) IGN_MISTAKES="$OPTARG"; [[ "$IGN_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-$NAME switch needs a number! you gave ${IGN_MISTAKES}"; false; };;
+		m) MAX_MISTAKES="$OPTARG"; [[ "$MAX_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-$NAME switch needs a number! you gave ${MAX_MISTAKES}"; false; };;
 		n) INTOPTS=n;;
 		q) VERBOSE=$((VERBOSE-1));;
 		t) MISCTOCHECK+="t";MISCTOCHECK+="M";; # TODO: missing test case
@@ -188,7 +191,8 @@ while getopts $OPTSTRING NAME; do
 done
 true
 shift $((OPTIND-1))
-test ${IGN_MISTAKES} -gt 0 && echo0 "# Will tolerate up to ${IGN_MISTAKES} mistakes before returning non-zero status"
+test ${IGN_MISTAKES} -gt 0 && echo0 "# Will return non-zero status only if more than ${IGN_MISTAKES} mistakes found"
+test ${MAX_MISTAKES} -gt 0 && echo0 "# Will tolerate up to ${MAX_MISTAKES} mistakes before returning non-zero status"
 [[ "$MISCTOCHECK" =~ "#" ]] && { echo1 "# Directory variable value beginning with # will be ignored."; }
 [[ "$MISCTOCHECK" =~ "%" ]] && { echo1 "# Directory variable value beginning with % will be ignored."; }
 PERRS_CNT=0; # modulepath mistakes count
@@ -275,10 +279,18 @@ else
 fi
 TERRS_CNT=$((TERRS_CNT+PERRS_CNT));
 #set -x
+function abort_on_threshold()
+{
+	if test ${MAX_MISTAKES} != 0 -a $((TERRS_CNT+MERRS_CNT)) -gt ${MAX_MISTAKES}; then
+		echo0 "# Encountered ${TERRS_CNT} mistakes (threshold was ${MAX_MISTAKES}): exiting now.";
+		exit -1; 
+	fi
+}
 function inc_err_cnt()
 {
 	MERRS_CNT=$((MERRS_CNT+1));
 	echo3 "# this/total mistakes detected: $MERRS_CNT/$TERRS_CNT";
+	abort_on_threshold
 }
 function mistake_csv()
 {
