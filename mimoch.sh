@@ -47,7 +47,7 @@ Where [options] are:
      -q            # decrease verbosity
      -v            # increase verbosity (up to 4 times)
      -n            # exit with zero status (as long as no internal errors encountered)
-     -i MAX        # will return non-zero status only if more than MAX mistakes
+     -i MAX        # will return non-zero status only if more than MAX mistakes found
      -#            # tolerate a *.DIR or *.PATH variable value whose value begins with \"#\"
      -%            # tolerate a *.DIR or *.PATH variable value whose value contains \"%\"
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
