@@ -47,7 +47,7 @@ Where [options] are:
      -q            # decrease verbosity
      -v            # increase verbosity (up to 4 times)
      -n            # exit with zero status (as long as no internal errors encountered)
-     -m MAX        # will tolerate up to MAX mistakes before returning non-zero status
+     -i MAX        # will tolerate up to MAX mistakes before returning non-zero status
      -#            # tolerate a *.DIR or *.PATH variable value whose value begins with \"#\"
      -%            # tolerate a *.DIR or *.PATH variable value whose value contains \"%\"
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
@@ -141,7 +141,7 @@ EOF
 	exit
 }
 echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
-OPTSTRING="ad:hm:nqtv#%CEHILMPSTX"
+OPTSTRING="ad:hi:nqtv#%CEHILMPSTX"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
 function echoX()
@@ -165,7 +165,7 @@ while getopts $OPTSTRING NAME; do
 		#a) CHECK_WHAT='a';;
 		a) DIRSTOCHECK=${DEF_DIRSTOCHECK}; MISCTOCHECK='HM';;
 		h) on_help;;
-		m) IGN_MISTAKES="$OPTARG"; [[ "$IGN_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-m switch needs a number! you gave ${IGN_MISTAKES}"; false; };;
+		i) IGN_MISTAKES="$OPTARG"; [[ "$IGN_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-$NAME switch needs a number! you gave ${IGN_MISTAKES}"; false; };;
 		n) INTOPTS=n;;
 		q) VERBOSE=$((VERBOSE-1));;
 		t) MISCTOCHECK+="t";MISCTOCHECK+="M";; # TODO: missing test case
