@@ -77,6 +77,11 @@ function result_msg()
 		echo -n " (of which ${2} offered a test command)"
 	fi
 	echo -n ". Detected ${3} mistakes in ${4} modulefiles."
+	#if test "${2}${3}" = 00 ; then
+	#	echo -n ". No mistake detected."
+	#else
+	#	echo -n ". Detected ${3} mistakes in ${4} modulefiles."
+	#fi
 }
 function sanitized_result_msg() 
 {
