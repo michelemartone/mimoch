@@ -73,15 +73,10 @@ function on_help() { echo "${LMC_HELP}";exit; }
 function result_msg() 
 {
 	echo -n "Checked ${1} modulefiles"
-	if [[ "$MISCTOCHECK" =~ X ]] ; then
+	if test -n "$TESTING" && [[ "$MISCTOCHECK" =~ X ]] ; then
 		echo -n " (of which ${2} offered a test command)"
 	fi
 	echo -n ". Detected ${3} mistakes in ${4} modulefiles."
-	#if test "${2}${3}" = 00 ; then
-	#	echo -n ". No mistake detected."
-	#else
-	#	echo -n ". Detected ${3} mistakes in ${4} modulefiles."
-	#fi
 }
 function sanitized_result_msg() 
 {
@@ -92,6 +87,7 @@ function do_test()
 {
 	echo " ===== Running self-tests ====="
 	set -e
+	TESTING=1;
 	#which $0 
 	$0 -h > ${DEV_NULL} 
 	test `$0 -h | wc -l` = 23 && echo " -h switch works"
