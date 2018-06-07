@@ -72,7 +72,19 @@ Note that a badly written module can execute commands in your shell by sole load
 function on_help() { echo "${LMC_HELP}";exit; }
 function result_msg() 
 {
-	echo -n "Checked ${1} modulefiles (of which ${2} offered a test command). Detected ${3} mistakes in ${4} modulefiles."
+	echo -n "Checked ${1} modulefiles"
+	if test -n "$TESTING" || [[ "$MISCTOCHECK" =~ X ]] ; then
+		echo -n " (of which ${2} offered a test command)"
+	fi
+	if test -n "$TESTING" ; then
+		echo -n ". Detected ${3} mistakes in ${4} modulefiles."
+	else
+		if test "${2}${3}" = 00 ; then
+			echo -n ". No mistake detected."
+		else
+			echo -n ". Detected ${3} mistakes in ${4} modulefiles."
+		fi
+	fi
 }
 function sanitized_result_msg() 
 {
@@ -83,6 +95,7 @@ function do_test()
 {
 	echo " ===== Running self-tests ====="
 	set -e
+	export TESTING=1;
 	#which $0 
 	$0 -h > ${DEV_NULL} 
 	test `$0 -h | wc -l` = 23 && echo " -h switch works"
@@ -465,7 +478,7 @@ done    ;
 	echo " Took ${SECONDS}s".
 if test ${TERRS_CNT} != 0; then
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
-	if test -n "${CL}" ; then echo "Modulefiles mention email addresses: ${CL}."; fi
+	#if test -n "${CL}" ; then echo "Modulefiles mention email addresses: ${CL}."; # gets confused by e,g, 'set maintainer "name surname <email>"'
 	#for MR in "${MRA[@]}" ; do echo Contact: ${MR}; done
 	if [[ "$INTOPTS" =~ n ]] || test ${TERRS_CNT} -le ${IGN_MISTAKES}; then exit 0; else exit -1; fi
 else
