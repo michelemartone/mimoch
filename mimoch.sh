@@ -76,7 +76,15 @@ function result_msg()
 	if test -n "$TESTING" && [[ "$MISCTOCHECK" =~ X ]] ; then
 		echo -n " (of which ${2} offered a test command)"
 	fi
-	echo -n ". Detected ${3} mistakes in ${4} modulefiles."
+	if test -n "$TESTING" ; then
+		echo -n ". Detected ${3} mistakes in ${4} modulefiles."
+	else
+		if test "${2}${3}" = 00 ; then
+			echo -n ". No mistake detected."
+		else
+			echo -n ". Detected ${3} mistakes in ${4} modulefiles."
+		fi
+	fi
 }
 function sanitized_result_msg() 
 {
