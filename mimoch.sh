@@ -72,7 +72,11 @@ Note that a badly written module can execute commands in your shell by sole load
 function on_help() { echo "${LMC_HELP}";exit; }
 function result_msg() 
 {
-	echo -n "Checked ${1} modulefiles (of which ${2} offered a test command). Detected ${3} mistakes in ${4} modulefiles."
+	echo -n "Checked ${1} modulefiles"
+	if [[ "$MISCTOCHECK" =~ X ]] ; then
+		echo -n " (of which ${2} offered a test command)"
+	fi
+	echo -n ". Detected ${3} mistakes in ${4} modulefiles."
 }
 function sanitized_result_msg() 
 {
