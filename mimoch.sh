@@ -465,7 +465,7 @@ done    ;
 	echo " Took ${SECONDS}s".
 if test ${TERRS_CNT} != 0; then
 	CL="`for MR in "${MRA[@]}" ; do echo $MR; done | cut -d \  -f 1 | sort | uniq | tr "\n" ' ' `"
-	if test -n "${CL}" ; then echo "Modulefiles mention email addresses: ${CL}."; fi
+	#if test -n "${CL}" ; then echo "Modulefiles mention email addresses: ${CL}."; # gets confused by e,g, 'set maintainer "name surname <email>"'
 	#for MR in "${MRA[@]}" ; do echo Contact: ${MR}; done
 	if [[ "$INTOPTS" =~ n ]] || test ${TERRS_CNT} -le ${IGN_MISTAKES}; then exit 0; else exit -1; fi
 else
