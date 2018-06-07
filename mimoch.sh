@@ -73,7 +73,7 @@ function on_help() { echo "${LMC_HELP}";exit; }
 function result_msg() 
 {
 	echo -n "Checked ${1} modulefiles"
-	if test -n "$TESTING" && [[ "$MISCTOCHECK" =~ X ]] ; then
+	if test -n "$TESTING" || [[ "$MISCTOCHECK" =~ X ]] ; then
 		echo -n " (of which ${2} offered a test command)"
 	fi
 	if test -n "$TESTING" ; then
@@ -95,7 +95,7 @@ function do_test()
 {
 	echo " ===== Running self-tests ====="
 	set -e
-	TESTING=1;
+	export TESTING=1;
 	#which $0 
 	$0 -h > ${DEV_NULL} 
 	test `$0 -h | wc -l` = 23 && echo " -h switch works"
