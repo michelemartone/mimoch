@@ -170,6 +170,14 @@ function echo1() { echoX ${FUNCNAME: -1} $@; }
 function echo2() { echoX ${FUNCNAME: -1} $@; }
 function echo3() { echoX ${FUNCNAME: -1} $@; }
 function echo4() { echoX ${FUNCNAME: -1} $@; }
+function contained_in()
+{
+	EL="$1" LIST="$2"
+	for LEL in $LIST; do
+		if test "$EL" = "$LEL" ; then return ; fi
+	done
+	false
+}
 MISCTOCHECK=''
 IGN_MISTAKES=0;
 MAX_MISTAKES=0;
@@ -229,10 +237,12 @@ if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 		if [[ "$MISCTOCHECK" =~ E ]] ; then
 			echo0 "# Specified $ARG, expanding to modules: ${AM}"
 		else
-			if test "${ARG}" != "${AM}" ; then
+			#if test "${ARG}" != "${AM}" ; then
+			if ! contained_in "${ARG}" "${AM}" ; then
 				echo0 "# No module simply named ${ARG} (maybe try expansion with -E ?)."
 				continue
 			else
+				AM="${ARG}"
 				echo0 "# Specified modules ${ARG} (no expansion)."
 			fi
 		fi
