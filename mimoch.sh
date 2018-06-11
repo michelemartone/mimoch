@@ -50,7 +50,7 @@ Where [options] are:
      -i MAX        # will return non-zero status only if more than MAX mistakes found
      -m MAX        # will exit and return non-zero status immediately as soon MAX mistakes are reached
      -#            # tolerate a *.DIR or *.PATH variable value whose value begins with \"#\"
-     -%            # tolerate a *.DIR or *.PATH variable value whose value contains \"%\"
+     -%            # tolerate a *.DIR or *.PATH variable value whose value contains \"%\" (if -% specified twice, truncate and only then check)
      -C            # check for presence of eventually declared _CC|_FC|_CXX variables
      -E            # check and expand (via \'module avail\') list of specified modules
      -H            # check \`module help\` output
@@ -361,7 +361,15 @@ function check_on_ptn()
 		DIR)
 		for PD in ${MV//:/ }; do # path directory
 			[[ "$MISCTOCHECK" =~ "#" ]] && test ${PD:0:1} = "#" && { echo3 "# Directory variable value begins with #: will be ignored (${MI}=${PD})." ; break; }
-			[[ "$MISCTOCHECK" =~ "%" && "$PD" =~ "%" ]] && { echo3 "# Directory variable value contains %: will be ignored (${MI}=${PD})." ; break; }
+			[[ "$MISCTOCHECK" =~ "%" && "$PD" =~ "%" ]] && { 
+				if [[ "$MISCTOCHECK" =~ "%%" ]] ; then
+					PD=${PD%%%*}
+					PD=${PD%/*}
+					echo3 "# Directory variable ${MI} value contains %: truncated to ${PD}";
+				else
+					echo3 "# Directory variable value contains %: will be ignored (${MI}=${PD})." ; break;
+				fi
+			 }
 			echo3 "Checking if $MI is a dir: $PD";
 			test -d ${PD} || { 
 				echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${PD}\" not a directory!${EI}" && inc_err_cnt;
