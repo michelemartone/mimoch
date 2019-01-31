@@ -56,7 +56,7 @@ Where [options] are:
      -H            # check \`module help\` output
      -I            # check include flags (unfinished: policy missing)
      -L            # check \`module load\` / \`module unload\`
-     -M            # fetch contact list from a *_MAINTAINER_INFO variable
+     -M            # fetch contact list from a *_MAINTAINER_LIST variable
      -P            # prereq / conflict module existence check
      -S            # check link flags (unfinished: policy missing)
      -T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
