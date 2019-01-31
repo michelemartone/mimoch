@@ -150,6 +150,12 @@ EOF
 	{ MODULEPATH=$TDIR $0    -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 4 1`
 	{ MODULEPATH=$TDIR $0    -v ${MN} ${MN} || true; } | grep `sanitized_result_msg 2 0 8 2`
 	{ MODULEPATH=$TDIR $0 -P -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 4 1`
+	cat > ${MP} << EOF
+#%Module
+# this module contains 0 mistakes
+setenv MY_USER_MAINTAINER_LIST "many"
+EOF
+	{ MODULEPATH=$TDIR $0 -MM -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 0 0`
 	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
 	exit
