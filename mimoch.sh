@@ -56,7 +56,7 @@ Where [options] are:
      -H            # check \`module help\` output
      -I            # check include flags (unfinished: policy missing)
      -L            # check \`module load\` / \`module unload\`
-     -M            # fetch contact list from a *_MAINTAINER_LIST variable
+     -M            # fetch contact list from a *_MAINTAINER_LIST variable; if specified twice (-MM), absence of such a variable will count as mistake.
      -P            # prereq / conflict module existence check
      -S            # check link flags (unfinished: policy missing)
      -T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
@@ -347,8 +347,13 @@ function check_on_ptn()
 	CHK="$1"
 	PTN="$2"
 	PVID="$PTN"
-	MMPL=`echo "$MS" | grep "^${PVID} .*$"` && \
-		test -n "${MMPL}" || return 0;
+	MMPL=`echo "$MS" | grep "^${PVID} .*$"` || \
+		{ test -z "$MMPL" -a "$CHK" = REQ && { \
+		echo3 "Missing of a *_${PTN} var!" && \
+		mistake_csv "${MN}" "${FC}" "Pattern ${PTN} is missing!" "" "" "${EI}";
+		return 0; }; 
+		} || return 0;
+	test -n "${MMPL}" || return 0;
 	while read MPL; do
 	MC="`echo ${MPL} | awk  -F ' ' '{print $1 }'`" && \
 	# path variable identifier expressions
@@ -358,6 +363,10 @@ function check_on_ptn()
 	test -n "$MA" || return 0; # matching assignment
 	echo2 "Checking if match on ${PVID}: match; \"${MA}\"";
 	case $CHK in
+		REQ)
+			echo4 "module ${MN} sets  ${PTN}: good"
+			return 0;
+		;;
 		DIR)
 		for PD in ${MV//:/ }; do # path directory
 			[[ "$MISCTOCHECK" =~ "#" ]] && test ${PD:0:1} = "#" && { echo3 "# Directory variable value begins with #: will be ignored (${MI}=${PD})." ; break; }
@@ -460,7 +469,12 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	MERRS_CNT=0; # module mistakes count
 	MS=`module show ${PWD}/${MN} 2>&1 | sed 's/\s\s*/ /g' | grep -v '^\(--\|module-whatis\|  *\)'  `
 	if [[ "$MISCTOCHECK" =~ M ]] ; then
-		check_on_ptn MEL 'setenv .*\(_MAINTAINER_LIST\)\>'
+		LPTN='setenv .*\(_MAINTAINER_LIST\)\>'
+		check_on_ptn MEL "${LPTN}"
+		if [[ "$MISCTOCHECK" =~ MM ]] ; then
+			echo3 "Checking existence of ${LPTN}"
+			check_on_ptn REQ "${LPTN}"
+		fi
 	fi
 	for PVID in "${VIDP[@]}" ;
 		do
