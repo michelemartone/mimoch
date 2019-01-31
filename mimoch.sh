@@ -101,11 +101,11 @@ function do_test()
 	test `$0 -h | wc -l` = 23 && echo " -h switch works"
 	test -d ${DEV_SHM}
 	test -w ${DEV_SHM}
-	TDIR=`mktemp -d ${DEV_SHM}/temporary-XXXX`
+	local TDIR=`mktemp -d ${DEV_SHM}/temporary-XXXX`
 	test -d ${TDIR}
-	NON_EXISTING_DIR=/not-existent-dir
-	NON_EXISTING_FILE=gcc_
-	EXISTING_DIR=/bin
+	local NON_EXISTING_DIR=/not-existent-dir
+	local NON_EXISTING_FILE=gcc_
+	local EXISTING_DIR=/bin
 	test ! -f ${NON_EXISTING_FILE}
 	test ! -d ${NON_EXISTING_DIR}
 	test   -d ${EXISTING_DIR}
@@ -113,8 +113,8 @@ function do_test()
 	# MODULEPATH shall have no trailing slash; use e.g. ${MODULEPATH/%\//} 
 	MODULEPATH=$TDIR $0       | grep `sanitized_result_msg 0 0 0 0`
 	MODULEPATH=      $0       | grep `sanitized_result_msg 0 0 0 0`
-	MN=testmodule.tcl
-	MP=${TDIR}/${MN}
+	local MN=testmodule.tcl
+	local MP=${TDIR}/${MN}
 	cat > ${MP} << EOF
 # this module is invalid: missing signature here
 prepend-path PATH ${EXISTING_DIR}
@@ -322,7 +322,7 @@ function mistake_csv()
 function mlamu_test()
 {
 	test -n "$1"
-	CMD="( cd && module load ${MN} && eval ${1} && module unload ${MN}; )"
+	local CMD="( cd && module load ${MN} && eval ${1} && module unload ${MN}; )"
 	test ${VERBOSE} -lt 4 && CMD+=" 2>&1 > ${DEV_NULL}"
 	eval "${CMD}" || { 
 		echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=\"${MV}\" test fails!${EI}" && inc_err_cnt;
@@ -333,9 +333,9 @@ function mlamu_test()
 function mhelp_test()
 {
 	test -n "$MN"
-	CMD="( module help ${MN}; )"
+	local CMD="( module help ${MN}; )"
 	test ${VERBOSE} -ge 4 && eval "${CMD}"
-	CMD="${CMD} 2>&1 | grep -q '^ERROR:'"
+	local CMD="${CMD} 2>&1 | grep -q '^ERROR:'"
 	if eval "${CMD}" ; then
 		echo0 "module ${MN} [${FN}] help emits 'ERROR:'!${EI}" && inc_err_cnt;
 		[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${FN} emits 'ERROR'!" "" "" "${EI}"
