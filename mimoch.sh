@@ -344,10 +344,10 @@ function mhelp_test()
 }
 function check_on_ptn()
 {
-	CHK="$1"
-	PTN="$2"
-	PVID="$PTN"
-	MMPL=`echo "$MS" | grep "^${PVID} .*$"` || \
+	local CHK="$1"
+	local PTN="$2"
+	local PVID="$PTN"
+	local MMPL=`echo "$MS" | grep "^${PVID} .*$"` || \
 		{ test -z "$MMPL" -a "$CHK" = REQ && { \
 		echo3 "Missing of a *_${PTN} var!" && \
 		mistake_csv "${MN}" "${FC}" "Pattern ${PTN} is missing!" "" "" "${EI}";
