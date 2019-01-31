@@ -172,7 +172,7 @@ function echo3() { echoX ${FUNCNAME: -1} $@; }
 function echo4() { echoX ${FUNCNAME: -1} $@; }
 function contained_in()
 {
-	EL="$1" LIST="$2"
+	local EL="$1" LIST="$2"
 	for LEL in $LIST; do
 		if test "$EL" = "$LEL" ; then return ; fi
 	done
@@ -359,7 +359,7 @@ function check_on_ptn()
 	# path variable identifier expressions
 	MI="`echo ${MPL} | awk  -F ' ' '{print $2 }'`" && \
 	MV="`echo ${MPL} | awk  -F ' ' '{print $3 }'`" && \
-	MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
+	local MA=`echo "${MC} ${MI}" | grep "${PVID}" 2>&1 `      && \
 	test -n "$MA" || return 0; # matching assignment
 	echo2 "Checking if match on ${PVID}: match; \"${MA}\"";
 	case $CHK in
@@ -368,6 +368,7 @@ function check_on_ptn()
 			return 0;
 		;;
 		DIR)
+		local PD;
 		for PD in ${MV//:/ }; do # path directory
 			[[ "$MISCTOCHECK" =~ "#" ]] && test ${PD:0:1} = "#" && { echo3 "# Directory variable value begins with #: will be ignored (${MI}=${PD})." ; break; }
 			[[ "$MISCTOCHECK" =~ "%" && "$PD" =~ "%" ]] && { 
@@ -435,6 +436,7 @@ function check_on_ptn()
 		;; 
 		MEX)
 		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
+			local RM;
 			for RM in ${MI} ${MV}  ; do
 				echo3 "Checking if a module: $RM"  
 				if test -z "`module_avail ${RM} 2>&1`" ; then
