@@ -446,7 +446,9 @@ function check_on_ptn()
 			done
 			}
 		;; 
-		*) false
+		*) 
+		echo1 "Internal error: internal command keyword not recognized!"
+		false
 	esac
 	done < <( echo "$MMPL" ) # process substitution
 }
