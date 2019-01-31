@@ -158,10 +158,10 @@ EOF
 	{ MODULEPATH=$TDIR $0 -MM -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 0 0`
 	cat > ${MP} << EOF
 #%Module
-# this module contains 0 mistakes
+# this module contains 1 mistakes
 setenv MY_USER_maintainer_list "many"
 EOF
-	{ MODULEPATH=$TDIR $0 -MM -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 0 0`
+	{ MODULEPATH=$TDIR $0 -MM -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 1 1`
 	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
 	exit
@@ -360,8 +360,9 @@ function check_on_ptn()
 	local PTN="$2"
 	local PVID="$PTN"
 	local MMPL=`echo "$MS" | grep "^${PVID} .*$"` || return 0;
-	test -z "$MMPL" -a "$CHK" = REQ && { \
-		echo3 "Missing of a *_${PTN} var!" && \
+	test -z "$MMPL" -a "$CHK" = REQ && { 
+		echo3 "Missing of a *_${PTN} var!" 
+		inc_err_cnt; 
 		mistake_csv "${MN}" "${FC}" "Pattern ${PTN} is missing!" "" "" "${EI}";
 		return 0; }; 
 	test -n "${MMPL}" || return 0;
