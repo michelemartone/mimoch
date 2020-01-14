@@ -166,7 +166,6 @@ EOF
 	echo " ===== Self-tests successful. ====="
 	exit
 }
-echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
 OPTSTRING="ad:hi:m:nqtv#%CEHILMPSTX"
 #CHECK_WHAT='';
 VERBOSE=${VERBOSE:-0}
@@ -222,6 +221,7 @@ while getopts $OPTSTRING NAME; do
 		*) false
 	esac
 done
+echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
 true
 shift $((OPTIND-1))
 test ${IGN_MISTAKES} -gt 0 && echo0 "# Will return non-zero status only if more than ${IGN_MISTAKES} mistakes found"
