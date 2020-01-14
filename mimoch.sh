@@ -16,7 +16,7 @@ set -e
 DEV_NULL=/dev/null
 DEV_SHM=/dev/shm
 test -w ${DEV_NULL}
-test `type -t module` = function
+test "`type -t module`" = function || { echo "no 'module' function in the current shell !"; exit -1; }
 which grep >${DEV_NULL}|| exit
 which date >${DEV_NULL}|| exit
 which sed  >${DEV_NULL}|| exit
