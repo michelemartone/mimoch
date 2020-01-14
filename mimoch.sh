@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Copyright 2018 Michele MARTONE
+# Copyright 2018-2020 Michele MARTONE
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 # 
@@ -117,7 +117,7 @@ function do_test()
 	test `type -t sanitized_result_msg` = function
 	# MODULEPATH shall have no trailing slash; use e.g. ${MODULEPATH/%\//} 
 	MODULEPATH=$TDIR $0       | grep `sanitized_result_msg 0 0 0 0`
-	MODULEPATH=      $0       | grep `sanitized_result_msg 0 0 0 0`
+	( MODULEPATH=    . $0;  ) | grep `sanitized_result_msg 0 0 0 0`;
 	local MN=testmodule.tcl
 	local MP=${TDIR}/${MN}
 	cat > ${MP} << EOF
