@@ -30,37 +30,42 @@ function module_avail()
 	true # rather than $? use test -n "`module_avail modulename`" here
 }
 DEF_DIRSTOCHECK='bdps' # see DIRSTOCHECK
-LMC_HELP="Usage alternatives:
+LMC_HELP=\
+"MIMOCH
+======
+# MIchele's shell MOdulefiles CHecker
 
-    $0 [options] <module-name> ...              # check specific modules (preferred style: uses existing MODULEPATH)
-    $0 [options] <full-modulefile-pathname> ... # check specified modulefiles (fragile: assumes its dirname to be MODULEPATH)
-    $0 [options] [[<modulefiles-dirpath>] <filter-find-pattern>] # search and check modulefiles
-Where [options] are:
-     -a            # short for '-d ${DEF_DIRSTOCHECK} -H -M'
-     -d SPECSTRING # check existence of specified directories. By default: ${DEF_DIRSTOCHECK}, where
-                   # p: check .*PATH variables
-                   # d: check .*DIR  variables
-                   # s: check .*_SRC variables
-                   # b: check .*BASE variables
-     -h            # print help and exit
-     -t            # additional TAB-columnated and \"TAB:\"-prefixed output (easily grep'able, three columns). implies -M
-     -q            # decrease verbosity
-     -v            # increase verbosity (up to 4 times)
-     -n            # exit with zero status (as long as no internal errors encountered)
-     -i MAX        # will return non-zero status only if more than MAX mistakes found
-     -m MAX        # will exit and return non-zero status immediately as soon MAX mistakes are reached
-     -#            # tolerate a *.DIR or *.PATH variable value whose value begins with \"#\"
-     -%            # tolerate a *.DIR or *.PATH variable value whose value contains \"%\" (if -% specified twice, truncate and only then check)
-     -C            # check for presence of eventually declared _CC|_FC|_CXX variables
-     -E            # check and expand (via \'module avail\') list of specified modules
-     -H            # check \`module help\` output
-     -I            # check include flags (unfinished: policy missing)
-     -L            # check \`module load\` / \`module unload\`
-     -M            # fetch contact list from a *_MAINTAINER_LIST variable; if specified twice (-MM), absence of such a variable will count as mistake.
-     -P            # prereq / conflict module existence check
-     -S            # check link flags (unfinished: policy missing)
-     -T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
-     -X            # if a *_USER_TEST or *_CMD_TEST variable is provided by a module, execute it in the shell using \`eval\` (implies module load/unload)
+Usage alternatives:
+
+	$0 [options] <module-name> ...              # check specific modules (preferred style: uses existing MODULEPATH)
+	$0 [options] <full-modulefile-pathname> ... # check specified modulefiles (fragile: assumes its dirname to be MODULEPATH)
+	$0 [options] [[<modulefiles-dirpath>] <filter-find-pattern>] # search and check modulefiles
+	Where [options] are:
+	-a            # short for '-d ${DEF_DIRSTOCHECK} -H -M'
+	-d SPECSTRING # check existence of specified directories. By default: ${DEF_DIRSTOCHECK}, where
+	              # p: check .*PATH variables
+	              # d: check .*DIR  variables
+	              # s: check .*_SRC variables
+	              # b: check .*BASE variables
+	-h            # print help and exit
+	-t            # additional TAB-columnated and \"TAB:\"-prefixed output (easily grep'able, three columns). implies -M
+	-q            # decrease verbosity
+	-v            # increase verbosity (up to 4 times)
+	-n            # exit with zero status (as long as no internal errors encountered)
+	-i MAX        # will return non-zero status only if more than MAX mistakes found
+	-m MAX        # will exit and return non-zero status immediately as soon MAX mistakes are reached
+	-#            # tolerate a *.DIR or *.PATH variable value whose value begins with \"#\"
+	-%            # tolerate a *.DIR or *.PATH variable value whose value contains \"%\" (if -% specified twice, truncate and only then check)
+	-C            # check for presence of eventually declared _CC|_FC|_CXX variables
+	-E            # check and expand (via \'module avail\') list of specified modules
+	-H            # check \`module help\` output
+	-I            # check include flags (unfinished: policy missing)
+	-L            # check \`module load\` / \`module unload\`
+	-M            # fetch contact list from a *_MAINTAINER_LIST variable; if specified twice (-MM), absence of such a variable will count as mistake.
+	-P            # prereq / conflict module existence check
+	-S            # check link flags (unfinished: policy missing)
+	-T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
+	-X            # if a *_USER_TEST or *_CMD_TEST variable is provided by a module, execute it in the shell using \`eval\` (implies module load/unload)
 
 Will look for common mistakes in shell modulefiles.
 If any mistake if found, will exit with non-zero status.
