@@ -6,4 +6,4 @@ test:
 r: README.md
 
 README.md: ./mimoch.sh
-	./mimoch.sh -h | sed 's/^//g' > $@
+	./mimoch.sh -h -h | sed 's/^//g' > $@

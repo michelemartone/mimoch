@@ -4,6 +4,7 @@ MIMOCH
 
 Usage alternatives:
 
+```bash
 	./mimoch.sh [options] <module-name> ...              # check specific modules (preferred style: uses existing MODULEPATH)
 	./mimoch.sh [options] <full-modulefile-pathname> ... # check specified modulefiles (fragile: assumes its dirname to be MODULEPATH)
 	./mimoch.sh [options] [[<modulefiles-dirpath>] <filter-find-pattern>] # search and check modulefiles
@@ -14,7 +15,7 @@ Usage alternatives:
 	              # d: check .*DIR  variables
 	              # s: check .*_SRC variables
 	              # b: check .*BASE variables
-	-h            # print help and exit
+	-h            # print help and exit (twice for Markdown markup)
 	-t            # additional TAB-columnated and "TAB:"-prefixed output (easily grep'able, three columns). implies -M
 	-q            # decrease verbosity
 	-v            # increase verbosity (up to 4 times)
@@ -33,6 +34,7 @@ Usage alternatives:
 	-S            # check link flags (unfinished: policy missing)
 	-T            # perform sanity test and exit (will use a temporary dir in /dev/shm)
 	-X            # if a *_USER_TEST or *_CMD_TEST variable is provided by a module, execute it in the shell using `eval` (implies module load/unload)
+```
 
 Will look for common mistakes in shell modulefiles.
 If any mistake if found, will exit with non-zero status.

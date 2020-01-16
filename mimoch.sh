@@ -30,6 +30,7 @@ function module_avail()
 	true # rather than $? use test -n "`module_avail modulename`" here
 }
 DEF_DIRSTOCHECK='bdps' # see DIRSTOCHECK
+function mk_hs() {
 LMC_HELP=\
 "MIMOCH
 ======
@@ -37,6 +38,7 @@ LMC_HELP=\
 
 Usage alternatives:
 
+${MD_BQ}
 	$0 [options] <module-name> ...              # check specific modules (preferred style: uses existing MODULEPATH)
 	$0 [options] <full-modulefile-pathname> ... # check specified modulefiles (fragile: assumes its dirname to be MODULEPATH)
 	$0 [options] [[<modulefiles-dirpath>] <filter-find-pattern>] # search and check modulefiles
@@ -47,7 +49,7 @@ Usage alternatives:
 	              # d: check .*DIR  variables
 	              # s: check .*_SRC variables
 	              # b: check .*BASE variables
-	-h            # print help and exit
+	-h            # print help and exit (twice for Markdown markup)
 	-t            # additional TAB-columnated and \"TAB:\"-prefixed output (easily grep'able, three columns). implies -M
 	-q            # decrease verbosity
 	-v            # increase verbosity (up to 4 times)
@@ -66,6 +68,7 @@ Usage alternatives:
 	-S            # check link flags (unfinished: policy missing)
 	-T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
 	-X            # if a *_USER_TEST or *_CMD_TEST variable is provided by a module, execute it in the shell using \`eval\` (implies module load/unload)
+${MD_EQ}
 
 Will look for common mistakes in shell modulefiles.
 If any mistake if found, will exit with non-zero status.
@@ -74,6 +77,8 @@ Note that mistakes might be detected twice.
 False positives are also possible in certain cases.
 Note that a badly written module can execute commands in your shell by sole load or show.
 "
+}
+mk_hs
 function on_help() { echo "${LMC_HELP}";exit; }
 function result_msg() 
 {
@@ -203,7 +208,7 @@ while getopts $OPTSTRING NAME; do
 	case $NAME in
 		#a) CHECK_WHAT='a';;
 		a) DIRSTOCHECK=${DEF_DIRSTOCHECK}; MISCTOCHECK='HM';;
-		h) on_help;;
+		h) MISCTOCHECK+="h";;
 		i) IGN_MISTAKES="$OPTARG"; [[ "$IGN_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-$NAME switch needs a number! you gave ${IGN_MISTAKES}"; false; };;
 		m) MAX_MISTAKES="$OPTARG"; [[ "$MAX_MISTAKES" =~ ^[0-9]+$ ]] || { echo "-$NAME switch needs a number! you gave ${MAX_MISTAKES}"; false; };;
 		n) INTOPTS=n;;
@@ -226,6 +231,9 @@ while getopts $OPTSTRING NAME; do
 		*) false
 	esac
 done
+MD_BQ='';MD_EQ='';
+[[ "$MISCTOCHECK" =~ h.*h ]] && { MD_BQ='```bash' MD_EQ='```' mk_hs;}
+[[ "$MISCTOCHECK" =~ "h" ]] && { on_help; }
 echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
 true
 shift $((OPTIND-1))
