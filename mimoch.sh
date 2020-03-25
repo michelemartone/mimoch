@@ -313,7 +313,7 @@ else
 		grep -l '#%Module' 2>&1 >${DEV_NULL} ${MF}  || continue # skip non-module files
 		#MN=`echo ${MF} | sed 's/\s\s*/ /g' | rev | awk  -F / '{print $1"/"$2 }'| rev` # module name
 		echo4 "# Found modulefile ${MF}"
-		MN=${MF}
+		MN=${MF#./} # heading ./ might break `module av`
 		MO="`MODULEPATH=${MD} module_avail ${MN}`"
 		#test -z "${MO}" && { echo "internal error with module avail ${MN}: ${MF}!"; exit 1; } # we assert module to be valid
 		if test ! -f "${USER_MP}" ; then test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; }; fi # e.g. tempdir/1.0~
