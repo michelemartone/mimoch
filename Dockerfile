@@ -16,10 +16,5 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install --yes \
 COPY "." "/mnt"
 WORKDIR "/mnt"
 
-# continue as an unpriviledged user
-RUN useradd "user"
-RUN chown --recursive "user:user" "."
-USER "user"
-
 # Build and test
 RUN . /etc/profile.d/modules.sh ; ./mimoch.sh -T
