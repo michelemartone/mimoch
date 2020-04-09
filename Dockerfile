@@ -22,4 +22,5 @@ RUN chown --recursive "user:user" "."
 USER "user"
 
 # Build and test
+RUN . /etc/profile.d/modules.sh ; which modulecmd
 RUN ./mimoch.sh -T
