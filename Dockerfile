@@ -3,7 +3,7 @@ ARG IMG="debian:unstable"
 FROM "${IMG}"
 
 # Declare the arguments
-ARG PKG="environment-modules bash"
+ARG PKG="environment-modules bash make"
 
 # Update the package lists
 RUN apt-get update
@@ -17,4 +17,4 @@ COPY "." "/mnt"
 WORKDIR "/mnt"
 
 # Build and test
-RUN . /etc/profile.d/modules.sh ; ./mimoch.sh -T
+RUN make batch-test;
