@@ -122,7 +122,7 @@ function do_test()
 	test `type -t sanitized_result_msg` = function
 	# MODULEPATH shall have no trailing slash; use e.g. ${MODULEPATH/%\//} 
 	MODULEPATH=$TDIR $0       | grep `sanitized_result_msg 0 0 0 0`
-	( MODULEPATH=    . $0;  ) | grep `sanitized_result_msg 0 0 0 0`;
+	( MODULEPATH=""  . $0;  ) | grep `sanitized_result_msg 0 0 0 0`;
 	local MN=testmodule.tcl
 	local MP=${TDIR}/${MN}
 	cat > ${MP} << EOF
@@ -232,6 +232,7 @@ while getopts $OPTSTRING NAME; do
 	esac
 done
 MD_BQ='';MD_EQ='';
+# shellcheck disable=SC2016
 [[ "$MISCTOCHECK" =~ h.*h ]] && { MD_BQ='```bash' MD_EQ='```' mk_hs;}
 [[ "$MISCTOCHECK" =~ "h" ]] && { on_help; }
 echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $*"
@@ -278,9 +279,9 @@ if test -n "${1}" -a -n "${MODULEPATH}" && test -n "`module_avail ${1}`" ; then
 			MN=${FN/#${MD}}; # cat prefix
 			test "${FN}" = "${MD}${MN}"
 			if test ! -d "${MD}" ; then echo4 "# skipping ${MD}: not a directory (you might have same-named modules in different dirs: fine)"; continue; fi; 
-			MFA+=(${FN});
-			MNA+=(${MN});
-			MDA+=(${MD});
+			MFA+=("${FN}");
+			MNA+=("${MN}");
+			MDA+=("${MD}");
 		done
 	done
 elif test -f "${1}" -a ! -d "${1}" ; then
@@ -291,9 +292,9 @@ elif test -f "${1}" -a ! -d "${1}" ; then
 			MN=${MN/\(*/} # clean up of e.g. '(default)' suffix
 			FN=${ARG}
 			MD=${FN/%${MN}};
-			MFA+=(${FN});
-			MNA+=(${MN});
-			MDA+=(${MD});
+			MFA+=("${FN}");
+			MNA+=("${MN}");
+			MDA+=("${MD}");
 		done
 	done
 else
@@ -318,9 +319,9 @@ else
 		#test -z "${MO}" && { echo "internal error with module avail ${MN}: ${MF}!"; exit 1; } # we assert module to be valid
 		if test ! -f "${USER_MP}" ; then test -z "${MO}" && { echo "skipping module avail ${MN}: ${MF}!"; continue; }; fi # e.g. tempdir/1.0~
 		echo4 "# Modulefile is contained in the custom module path."
-		MFA+=(${FN});
-		MNA+=(${MN});
-		MDA+=(${MD});
+		MFA+=("${FN}");
+		MNA+=("${MN}");
+		MDA+=("${MD}");
 		# echo "# Will check module ${MN}, modulefile ${FN}"
 	done
 	done
@@ -532,7 +533,7 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 		echo3 "Checking help ${FN}";
 		mhelp_test
 	fi
-	test $MERRS_CNT = 0 || { TERRS_CNT=$((TERRS_CNT+MERRS_CNT)); FMA+=(${FN}); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
+	test $MERRS_CNT = 0 || { TERRS_CNT=$((TERRS_CNT+MERRS_CNT)); FMA+=("${FN}"); if test -n "${CI}"; then MRA+=("${CL/% /} ${FN}"); else CL=''; fi; }
 	echo1 "Checked ${FN}"
 done    ; 
 	result_msg ${#MFA[@]} ${MEXET_CNT} ${TERRS_CNT} ${#FMA[@]}
