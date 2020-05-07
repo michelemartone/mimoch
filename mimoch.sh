@@ -99,7 +99,7 @@ function result_msg()
 function sanitized_result_msg() 
 {
 	test `type -t result_msg` = function
-	result_msg $@ | sed 's/[^a-zA-Z0-9]/./g'
+	result_msg "$@" | sed 's/[^a-zA-Z0-9]/./g'
 }
 function do_test()
 {
@@ -183,14 +183,14 @@ function echoX()
 {
 	if test ${VERBOSE} -ge ${1}; then
 		shift;
-		echo $@
+		echo "$@"
 	fi
 }
-function echo0() { echoX ${FUNCNAME: -1} $@; }
-function echo1() { echoX ${FUNCNAME: -1} $@; }
-function echo2() { echoX ${FUNCNAME: -1} $@; }
-function echo3() { echoX ${FUNCNAME: -1} $@; }
-function echo4() { echoX ${FUNCNAME: -1} $@; }
+function echo0() { echoX ${FUNCNAME: -1} "$@"; }
+function echo1() { echoX ${FUNCNAME: -1} "$@"; }
+function echo2() { echoX ${FUNCNAME: -1} "$@"; }
+function echo3() { echoX ${FUNCNAME: -1} "$@"; }
+function echo4() { echoX ${FUNCNAME: -1} "$@"; }
 function contained_in()
 {
 	local EL="$1" LIST="$2"
@@ -234,7 +234,7 @@ done
 MD_BQ='';MD_EQ='';
 [[ "$MISCTOCHECK" =~ h.*h ]] && { MD_BQ='```bash' MD_EQ='```' mk_hs;}
 [[ "$MISCTOCHECK" =~ "h" ]] && { on_help; }
-echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $@"
+echo "# `date +%Y%m%d@%H:%M`: ${HOSTNAME}: $0 $*"
 true
 shift $((OPTIND-1))
 test ${IGN_MISTAKES} -gt 0 && echo0 "# Will return non-zero status only if more than ${IGN_MISTAKES} mistakes found"
