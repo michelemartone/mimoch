@@ -122,6 +122,7 @@ function do_test()
 	test `type -t sanitized_result_msg` = function
 	# MODULEPATH shall have no trailing slash; use e.g. ${MODULEPATH/%\//} 
 	MODULEPATH=$TDIR $0       | grep `sanitized_result_msg 0 0 0 0`
+	# shellcheck disable=SC1090
 	( MODULEPATH=""  . $0;  ) | grep `sanitized_result_msg 0 0 0 0`;
 	local MN=testmodule.tcl
 	local MP=${TDIR}/${MN}
@@ -172,6 +173,7 @@ EOF
 setenv MY_USER_maintainer_list "many"
 EOF
 	{ MODULEPATH=$TDIR $0 -MM -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 1 1`
+	# shellcheck disable=SC2064
 	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
 	exit
@@ -308,7 +310,8 @@ else
 	echo1 "# Looking into directory ${MD} ${PATTERN:+ with pattern $PATTERN}"
 	test -d ${MD} || { PERRS_CNT=$((PERRS_CNT+1)); echo0 "# Ignoring non-existing subpath ${MD} (counts as mistake)"; continue; }
 	cd ${MD} && echo3 "# Stepped into directory ${MD}; will look for module files, with pattern \"${PATTERN}\"."
-	for MF in `find -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
+	# shellcheck disable=SC2044 # want loop, no read subshell
+	for MF in `find . -type f ${PATTERN:+-iwholename \*$PATTERN\*}`; do # module file
 		FN=${MD}/${MF}
 		bn=`basename ${MF}`; test ${bn:0:1} = . && continue # no hidden files
 		grep -l '#%Module' 2>&1 >${DEV_NULL} ${MF}  || continue # skip non-module files
@@ -489,6 +492,7 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	CI=`grep @ ${MN} || true` 
 	ERE='[a-zA-Z.]\+@[a-zA-Z]\+.[a-zA-Z]\+'
 	NRE='[^@]\+\s\+'
+	# shellcheck disable=SC2001
 	CL=`echo ${CI} | sed "s/\(${NRE}\)\\+\(${ERE}\)/\2 /g"`
 	EI=''
 	test -n "${CL}" && EI=" [${CL/% /}]" # extra contact info, from the comments (old way)
