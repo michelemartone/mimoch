@@ -2,11 +2,11 @@ sudo: required
 
 env:
   matrix:
-    - IMG=ubuntu:18.04
+    - IMG=ubuntu:18.04 PKG="environment-modules bash make tcl"
     - IMG=ubuntu:19.04
     - IMG=ubuntu:19.10
     - IMG=ubuntu:20.04
-    - IMG=debian:stable
+    - IMG=debian:stable PKG="environment-modules bash make tcl"
     - IMG=debian:unstable
     - IMG=debian:testing
 
