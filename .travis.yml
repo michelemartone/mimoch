@@ -18,6 +18,6 @@ services:
  - docker
 
 script:
-  - docker build --build-arg "IMG" "."
+  - docker build --build-arg "IMG" --build-arg "PKG" "."
 
 cache: false
