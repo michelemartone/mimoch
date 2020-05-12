@@ -10,6 +10,10 @@ env:
     - IMG=debian:unstable
     - IMG=debian:testing
 
+jobs:
+  allow_failures:
+    - env: IMG=ubuntu:19.04
+
 services:
  - docker
 
