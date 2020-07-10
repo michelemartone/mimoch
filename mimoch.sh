@@ -362,7 +362,7 @@ function mlamu_test()
 function mhelp_test()
 {
 	test -n "$MN"
-	local CMD="( module help ${MN}; )"
+	local CMD="( MODULEPATH=${MD} module help ${MN}; )"
 	test ${VERBOSE} -ge 4 && eval "${CMD}"
 	local CMD="${CMD} 2>&1 | grep -q '^ERROR:'"
 	if eval "${CMD}" ; then
