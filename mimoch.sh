@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Copyright 2018-2020 Michele MARTONE
+# Copyright 2018-2021 Michele MARTONE
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 # 
@@ -489,7 +489,8 @@ for MFI in `seq 0 $((${#MFA[@]}-1))`; do
 	MD="${MDA[$MFI]}" ;
 	echo3 "# Will check module ${MN}, modulefile ${FN}, in dir ${MD}"
 	cd ${MD}
-	CI=`grep @ ${MN} || true` 
+	SRE='\(-path\|FILE\)' # in guessing email, avoid lines with this
+	CI=`( grep @ ${MN} | grep -v -- "${SRE}" ) || true`
 	ERE='[a-zA-Z.]\+@[a-zA-Z]\+.[a-zA-Z]\+'
 	NRE='[^@]\+\s\+'
 	# shellcheck disable=SC2001
