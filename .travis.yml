@@ -7,7 +7,6 @@ env:
   matrix:
     - IMG=ubuntu:18.04 PKG="environment-modules bash make tclsh"
     - IMG=ubuntu:19.04
-    - IMG=ubuntu:19.10
     - IMG=ubuntu:20.04
     - IMG=debian:stable PKG="environment-modules bash make tclsh"
     - IMG=debian:unstable
