@@ -24,7 +24,7 @@ Usage alternatives:
 	-m MAX        # will exit and return non-zero status immediately as soon MAX mistakes are reached
 	-#            # tolerate a *.DIR or *.PATH variable value whose value begins with "#"
 	-%            # tolerate a *.DIR or *.PATH variable value whose value contains "%" (if -% specified twice, truncate and only then check)
-	-C            # check for presence of eventually declared _CC|_FC|_CXX variables
+	-C            # check for presence of variables named _CC|_FC|_CXX (suffix)
 	-E            # check and expand (via \'module avail\') list of specified modules
 	-H            # check `module help` output
 	-I            # check include flags (unfinished: policy missing)

@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Copyright 2018-2021 Michele MARTONE
+# Copyright 2018-2022 Michele MARTONE
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 # 
@@ -58,7 +58,7 @@ ${MD_BQ}
 	-m MAX        # will exit and return non-zero status immediately as soon MAX mistakes are reached
 	-#            # tolerate a *.DIR or *.PATH variable value whose value begins with \"#\"
 	-%            # tolerate a *.DIR or *.PATH variable value whose value contains \"%\" (if -% specified twice, truncate and only then check)
-	-C            # check for presence of eventually declared _CC|_FC|_CXX variables
+	-C            # check for presence of variables named _CC|_FC|_CXX (suffix)
 	-E            # check and expand (via \'module avail\') list of specified modules
 	-H            # check \`module help\` output
 	-I            # check include flags (unfinished: policy missing)
