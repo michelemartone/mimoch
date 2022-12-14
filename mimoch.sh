@@ -113,6 +113,8 @@ function do_test()
 	test -w ${DEV_SHM}
 	local TDIR=`mktemp -d ${DEV_SHM}/temporary-XXXX`
 	test -d ${TDIR}
+	trap "rm -fR ${TDIR}; echo ' ===== sanity test failed! ===== '" ERR
+	trap "rm -fR ${TDIR}" EXIT
 	local NON_EXISTING_DIR=/not-existent-dir
 	local NON_EXISTING_FILE=gcc_
 	local EXISTING_DIR=/bin
@@ -180,7 +182,6 @@ setenv MY_PACKAGE_LIB "-L/path-to-non-existing-path -L/ -L/again-not-ok -L wrong
 EOF
 	{ MODULEPATH=$TDIR $0 -S  -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 2 1`
 	# shellcheck disable=SC2064
-	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
 	exit
 }
