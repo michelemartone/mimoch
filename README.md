@@ -31,7 +31,7 @@ Usage alternatives:
 	-L            # check `module load` / `module unload`
 	-M            # fetch contact list from a *_MAINTAINER_LIST variable; if specified twice (-MM), absence of such a variable will count as mistake.
 	-P            # prereq / conflict module existence check
-	-S            # check link flags (unfinished: policy missing)
+	-S            # in variables matching _SHLIB|_LIB|LDFLAGS|LIBS check that each '-L/.* ' occurrence specifies an existing, space-free path
 	-T            # perform sanity test and exit (will use a temporary dir in /dev/shm)
 	-X            # if a *_USER_TEST or *_CMD_TEST variable is provided by a module, execute it in the shell using `eval` (implies module load/unload)
 ```

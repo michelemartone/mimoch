@@ -65,7 +65,7 @@ ${MD_BQ}
 	-L            # check \`module load\` / \`module unload\`
 	-M            # fetch contact list from a *_MAINTAINER_LIST variable; if specified twice (-MM), absence of such a variable will count as mistake.
 	-P            # prereq / conflict module existence check
-	-S            # check link flags (unfinished: policy missing)
+	-S            # in variables matching _SHLIB|_LIB|LDFLAGS|LIBS check that each '-L/.* ' occurrence specifies an existing, space-free path
 	-T            # perform sanity test and exit (will use a temporary dir in ${DEV_SHM})
 	-X            # if a *_USER_TEST or *_CMD_TEST variable is provided by a module, execute it in the shell using \`eval\` (implies module load/unload)
 ${MD_EQ}
@@ -173,6 +173,12 @@ EOF
 setenv MY_USER_maintainer_list "many"
 EOF
 	{ MODULEPATH=$TDIR $0 -MM -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 1 1`
+	cat > ${MP} << EOF
+#%Module
+# this module contains 2 mistakes (we assume / exists)
+setenv MY_PACKAGE_LIB "-L/path-to-non-existing-path -L/ -L/again-not-ok -L wrong-path -lwell-this-is-a-lib"
+EOF
+	{ MODULEPATH=$TDIR $0 -S  -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 2 1`
 	# shellcheck disable=SC2064
 	trap "rm -fR ${TDIR}" EXIT
 	echo " ===== Self-tests successful. ====="
@@ -456,13 +462,28 @@ function check_on_ptn()
 		;; 
 		SHL)
 		true && { \
-			echo3 "NEED CHECK if $MV is OK"  
-			# TODO: Need a policy here. E.g.
+			# TODO: May consider further policy here. E.g.
 			#  Shall one check this after prereq loading ?
 			#  Shall one use specific compilers ?
-			true
+			echo3 "Checking if -L/ components of ${MA} are directories"
+			SHLRS="${MPL#$MA}"
+			if [[   "${SHLRS}" =~ \  ]] ; then
+				local TMV="$(echo "$SHLRS" | sed 's/^ *{//g;s/}.*//g')"
+				echo3 "Considering: ${TMV}"
+				for PD in $(echo "$TMV"  | sed 's/\(-L\/[^ ]*\)[ ]\+/\1\n/g' | grep '^-L/' | sed 's/^-L//g;s/ *$//g') ; do
+					echo4 "Checking if the following $MI component a dir: $PD";
+					test -d ${PD} || {
+						echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=..\"${PD}\".. not a directory!${EI}" && inc_err_cnt;
+						[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MI}=${PD} not a directory" "${MI}" "${PD}" "${EI}"
+						true;
+					}
+				done
+			fi
+			if [[ ! "$MV" =~ ' ' ]] ; then
+				true # we ignore this case
+			fi
 			}
-		;; 
+		;;
 		MEX)
 		test "${MC}" == 'conflict' -o "${MC}" == 'prereq' && { \
 			local RM;
