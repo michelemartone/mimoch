@@ -1,3 +1,5 @@
+SHELL=/bin/bash -ex
+
 all: test README.md
 
 test:
