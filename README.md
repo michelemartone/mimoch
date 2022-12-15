@@ -27,7 +27,7 @@ Usage alternatives:
 	-C            # check for presence of variables named _CC|_FC|_CXX (suffix)
 	-E            # check and expand (via \'module avail\') list of specified modules
 	-H            # check `module help` output
-	-I            # check include flags (unfinished: policy missing)
+	-I            # in variables matching _INC check that each '-I/.* ' occurrence specifies an existing, space-free path
 	-L            # check `module load` / `module unload`
 	-M            # fetch contact list from a *_MAINTAINER_LIST variable; if specified twice (-MM), absence of such a variable will count as mistake.
 	-P            # prereq / conflict module existence check

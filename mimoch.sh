@@ -61,7 +61,7 @@ ${MD_BQ}
 	-C            # check for presence of variables named _CC|_FC|_CXX (suffix)
 	-E            # check and expand (via \'module avail\') list of specified modules
 	-H            # check \`module help\` output
-	-I            # check include flags (unfinished: policy missing)
+	-I            # in variables matching _INC check that each '-I/.* ' occurrence specifies an existing, space-free path
 	-L            # check \`module load\` / \`module unload\`
 	-M            # fetch contact list from a *_MAINTAINER_LIST variable; if specified twice (-MM), absence of such a variable will count as mistake.
 	-P            # prereq / conflict module existence check
@@ -179,8 +179,9 @@ EOF
 #%Module
 # this module contains 2 mistakes (we assume / exists)
 setenv MY_PACKAGE_LIB "-L/path-to-non-existing-path -L/ -L/again-not-ok -L wrong-path -lwell-this-is-a-lib"
+setenv MY_PACKAGE_INC "-I/path-to-non-existing-path -I/ -I/again-not-ok -I wrong-path -lwell-this-is-a-lib"
 EOF
-	{ MODULEPATH=$TDIR $0 -S  -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 2 1`
+	{ MODULEPATH=$TDIR $0 -IS -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 4 1`
 	# shellcheck disable=SC2064
 	echo " ===== Self-tests successful. ====="
 	exit
@@ -378,6 +379,26 @@ function mhelp_test()
 		true;
 	fi
 }
+function check_flag_broken_ptns()
+{
+	test -n "$PF"
+	test -n "$MN"
+	test -n "$MPL"
+	echo3 "Checking if $PF/ components of ${MA} are directories"
+	local SHLRS="${MPL#$MA}"
+	if [[   "${SHLRS}" =~ \  ]] ; then
+		local TMV="$(echo "$SHLRS" | sed 's/^ *{//g;s/}.*//g')"
+		echo3 "Considering: ${TMV}"
+		for PD in $(echo "$TMV"  | sed 's/\('$PF'\/[^ ]*\)[ ]\+/\1\n/g' | grep '^'$PF'/' | sed 's/^'$PF'//g;s/ *$//g') ; do
+			echo4 "Checking if the following $MI component a dir: $PD";
+			test -d ${PD} || {
+				echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=..\"${PD}\".. not a directory!${EI}" && inc_err_cnt;
+				[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MI}=${PD} not a directory" "${MI}" "${PD}" "${EI}"
+				true;
+			}
+		done
+	fi
+}
 function check_on_ptn()
 {
 	local CHK="$1"
@@ -454,11 +475,14 @@ function check_on_ptn()
 		;; 
 		INC)
 		true && { \
-			echo3 "NEED CHECK if $MV is OK"  
-			# TODO: Need a policy here. E.g.
+			# TODO: May consider further policy here. E.g.
 			#  Shall one check this after prereq loading ?
 			#  Shall one use specific compilers ?
-			true
+			local PF=-I;
+			check_flag_broken_ptns;
+			if [[ ! "$MV" =~ ' ' ]] ; then
+				true # we ignore this case
+			fi
 			}
 		;; 
 		SHL)
@@ -466,20 +490,8 @@ function check_on_ptn()
 			# TODO: May consider further policy here. E.g.
 			#  Shall one check this after prereq loading ?
 			#  Shall one use specific compilers ?
-			echo3 "Checking if -L/ components of ${MA} are directories"
-			SHLRS="${MPL#$MA}"
-			if [[   "${SHLRS}" =~ \  ]] ; then
-				local TMV="$(echo "$SHLRS" | sed 's/^ *{//g;s/}.*//g')"
-				echo3 "Considering: ${TMV}"
-				for PD in $(echo "$TMV"  | sed 's/\(-L\/[^ ]*\)[ ]\+/\1\n/g' | grep '^-L/' | sed 's/^-L//g;s/ *$//g') ; do
-					echo4 "Checking if the following $MI component a dir: $PD";
-					test -d ${PD} || {
-						echo0 "module ${MN} [${FN}] ${MC} ${MI} \"$MI\"=..\"${PD}\".. not a directory!${EI}" && inc_err_cnt;
-						[[ "$MISCTOCHECK" =~ t ]] && mistake_csv "${MN}" "${FC}" "${MI}=${PD} not a directory" "${MI}" "${PD}" "${EI}"
-						true;
-					}
-				done
-			fi
+			local PF=-L;
+			check_flag_broken_ptns;
 			if [[ ! "$MV" =~ ' ' ]] ; then
 				true # we ignore this case
 			fi
