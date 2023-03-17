@@ -13,7 +13,7 @@ Usage alternatives:
 	-d SPECSTRING # check existence of specified directories. By default: bdps, where
 	              # p: check .*PATH variables
 	              # d: check .*DIR  variables
-	              # s: check .*_SRC variables
+		      # s: check .*_SRC variables (if these start with http:// or https://, will be ignored)
 	              # b: check .*BASE variables
 	-h            # print help and exit (twice for Markdown markup)
 	-t            # additional TAB-columnated and "TAB:"-prefixed output (easily grep'able, three columns). implies -M

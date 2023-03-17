@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Copyright 2018-2022 Michele MARTONE
+# Copyright 2018-2023 Michele MARTONE
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 # 
@@ -47,7 +47,7 @@ ${MD_BQ}
 	-d SPECSTRING # check existence of specified directories. By default: ${DEF_DIRSTOCHECK}, where
 	              # p: check .*PATH variables
 	              # d: check .*DIR  variables
-	              # s: check .*_SRC variables
+		      # s: check .*_SRC variables (if these start with http:// or https://, will be ignored)
 	              # b: check .*BASE variables
 	-h            # print help and exit (twice for Markdown markup)
 	-t            # additional TAB-columnated and \"TAB:\"-prefixed output (easily grep'able, three columns). implies -M
@@ -183,6 +183,14 @@ setenv MY_PACKAGE_INC "-I/path-to-non-existing-path -I/ -I/again-not-ok -I wrong
 EOF
 	{ MODULEPATH=$TDIR $0 -IS -v ${MN}       || true; } | grep `sanitized_result_msg 1 0 4 1`
 	# shellcheck disable=SC2064
+	cat > ${MP} << EOF
+#%Module
+# this module contains a mistake on _DIR (can't encode an URL)
+setenv MY_USER_SRC  "http://url"
+setenv MY_USER_DIR  "http://url"
+EOF
+	{ MODULEPATH=$TDIR $0 -vvv -d sd ${MN} ${MN} || true; } | grep `sanitized_result_msg 2 0 4 2`
+	{ MODULEPATH=$TDIR $0 -vvv -d s  ${MN} ${MN} || true; } | grep `sanitized_result_msg 2 0 0 0`
 	echo " ===== Self-tests successful. ====="
 	exit
 }
@@ -425,6 +433,7 @@ function check_on_ptn()
 			return 0;
 		;;
 		DIR)
+		[[ "${MI}" =~ ^.*_SRC$ && "${MV}" =~ ^https?:// ]] && { echo3 "# Directory variable value seems an URL: will be ignored (${MI}=${MV})." ; break; }
 		local PD;
 		for PD in ${MV//:/ }; do # path directory
 			[[ "$MISCTOCHECK" =~ "#" ]] && test ${PD:0:1} = "#" && { echo3 "# Directory variable value begins with #: will be ignored (${MI}=${PD})." ; break; }
