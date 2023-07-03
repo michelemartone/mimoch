@@ -26,7 +26,7 @@ function my_which()
 }
 function module_avail()
 {
-	module avail ${1} 2>&1 | grep -v ^--- | sed 's/ *$//g' # trimming extra spaces
+	module avail ${1} 2>&1 | grep -v ^--- | sed 's/ *$//g; s/(default)//g' # trimming extra spaces and encompassing '(default)'
 	true # rather than $? use test -n "`module_avail modulename`" here
 }
 DEF_DIRSTOCHECK='bdps' # see DIRSTOCHECK
@@ -191,6 +191,19 @@ setenv MY_USER_DIR  "http://url"
 EOF
 	{ MODULEPATH=$TDIR $0 -vvv -d sd ${MN} ${MN} || true; } | grep `sanitized_result_msg 2 0 4 2`
 	{ MODULEPATH=$TDIR $0 -vvv -d s  ${MN} ${MN} || true; } | grep `sanitized_result_msg 2 0 0 0`
+	mkdir -p ${TDIR}/dir
+	rm ${MP}
+	local MP=${TDIR}/dir/${MN}
+	cat > ${MP} << EOF
+#%Module
+prepend-path PATH ${NON_EXISTING_DIR}
+EOF
+	local MP=${TDIR}/dir/.version
+	cat > ${MP} << EOF
+#%Module
+set ModulesVersion ${MN}
+EOF
+	{ MODULEPATH=$TDIR $0 -vvv -n -d p -L dir/${MN} || true; } | grep `sanitized_result_msg 1 0 1 1`
 	echo " ===== Self-tests successful. ====="
 	exit
 }
